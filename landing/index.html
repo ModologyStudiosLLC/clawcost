@@ -894,11 +894,28 @@ footer {
         <div class="bento-desc">Usage data is stored in a local SQLite database at <code style="font-size:11px;background:rgba(255,255,255,0.07);padding:2px 5px;border-radius:4px">~/.clawcost/usage.db</code>. Nothing leaves your machine.</div>
       </div>
 
-      <!-- Card 6: Multi-provider -->
-      <div class="bento-card reveal reveal-delay-3">
-        <div class="bento-icon green">🌐</div>
-        <div class="bento-title">Anthropic + OpenAI</div>
-        <div class="bento-desc">Works with all major providers OpenClaw supports. Accurate pricing for Claude, GPT-4o, o3, and Gemini models built in.</div>
+      <!-- Card 6: Alerts -->
+      <div class="bento-card reveal reveal-delay-2">
+        <div class="bento-icon amber">🔔</div>
+        <div class="bento-title">Slack + email alerts</div>
+        <div class="bento-desc">Get notified at 80% and 100% of your budget — in Slack or by email. Paste a webhook URL and you're done. Built in, no extra service needed.</div>
+      </div>
+
+      <!-- Card 7: Multi-provider — now full width -->
+      <div class="bento-card wide reveal reveal-delay-3">
+        <div style="display:flex;align-items:flex-start;gap:32px">
+          <div>
+            <div class="bento-icon green">🌐</div>
+            <div class="bento-title">Anthropic + OpenAI</div>
+            <div class="bento-desc">Works with all major providers OpenClaw supports. Accurate pricing for Claude, GPT-4o, o3, and Gemini models built in. Unknown models fall back to Sonnet rates.</div>
+          </div>
+          <div style="flex:1;background:#0a0a0c;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:16px;font-family:monospace;font-size:12px;line-height:1.9">
+            <div><span style="color:#4a4d62"># Anthropic</span></div>
+            <div><span style="color:#7c3aed">ANTHROPIC_BASE_URL</span><span style="color:#8b8fa8">=http://localhost:4100/v1</span></div>
+            <div style="margin-top:6px"><span style="color:#4a4d62"># OpenAI</span></div>
+            <div><span style="color:#7c3aed">OPENAI_BASE_URL</span><span style="color:#8b8fa8">=http://localhost:4100/v1</span></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -925,8 +942,8 @@ footer {
       </div>
       <div class="step reveal reveal-delay-2">
         <div class="step-num">Step 03</div>
-        <div class="step-title">Set your budget and go</div>
-        <div class="step-desc">Open the dashboard, set your daily and monthly limits, and forget about it. ClawCost handles the rest.</div>
+        <div class="step-title">Set budgets, add alerts, go</div>
+        <div class="step-desc">Open the dashboard, set your limits, and optionally paste a Slack webhook or Resend key for alerts at 80% and 100%. Then forget about it.</div>
         <div class="step-code"><span>Open →</span> http://localhost:4100</div>
       </div>
     </div>
@@ -938,8 +955,8 @@ footer {
   <div class="container">
     <div style="text-align:center">
       <div class="section-label reveal" style="justify-content:center">Pricing</div>
-      <h2 class="section-title reveal reveal-delay-1">Free to run yourself.<br>More coming soon.</h2>
-      <p class="section-sub reveal reveal-delay-2" style="margin:0 auto 0">ClawCost is open source. The self-hosted version is and always will be free. Cloud-hosted tiers are in early access.</p>
+      <h2 class="section-title reveal reveal-delay-1">Free to run yourself.<br>Hosted tier coming soon.</h2>
+      <p class="section-sub reveal reveal-delay-2" style="margin:0 auto 0">The self-hosted version — including Slack and email alerts — is free forever. A managed hosted version with no server required is in early access.</p>
     </div>
 
     <div class="pricing-grid">
@@ -948,17 +965,18 @@ footer {
         <div class="pricing-price">
           <span class="pricing-amount">Free</span>
         </div>
-        <p class="pricing-desc">Self-host on your own machine. Full feature set, no limits.</p>
+        <p class="pricing-desc">Self-host on your own machine. Full feature set including alerts — no limits, forever.</p>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
           <li>Proxy for Anthropic + OpenAI</li>
-          <li>Real-time token tracking</li>
-          <li>Hard daily + monthly budgets</li>
-          <li>Local SQLite database</li>
+          <li>Real-time per-model token tracking</li>
+          <li>Hard daily + monthly budget blocks</li>
+          <li>Local SQLite — nothing leaves your machine</li>
           <li>Live dashboard at localhost</li>
-          <li class="muted">Cloud-synced dashboard</li>
-          <li class="muted">Email + Slack alerts</li>
-          <li class="muted">Mobile push notifications</li>
+          <li>Slack webhook alerts at 80% + 100%</li>
+          <li>Email alerts via Resend</li>
+          <li class="muted">Hosted — no server required</li>
+          <li class="muted">Dashboard accessible from anywhere</li>
         </ul>
         <a href="https://github.com/MJFlanigan5/clawcost" class="pricing-btn outline" target="_blank">View on GitHub →</a>
       </div>
@@ -967,20 +985,20 @@ footer {
         <div class="pricing-badge">Early Access</div>
         <div class="pricing-tier">Pro</div>
         <div class="pricing-price">
-          <span class="pricing-amount">$19</span>
+          <span class="pricing-amount">$12</span>
           <span class="pricing-per">/mo</span>
         </div>
-        <p class="pricing-desc">Managed cloud dashboard. No self-hosting required.</p>
+        <p class="pricing-desc">Fully managed. No server, no terminal, no maintenance — just point your API key at us.</p>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
           <li>Everything in Open Source</li>
-          <li>Cloud-synced dashboard</li>
-          <li>Email alerts on budget warnings</li>
-          <li>Mobile push notifications</li>
-          <li>30-day cost history</li>
-          <li>Smart model downgrade routing</li>
-          <li class="muted">Team budget management</li>
-          <li class="muted">Slack integration</li>
+          <li>Hosted proxy — no server required</li>
+          <li>Dashboard accessible from any device</li>
+          <li>Automatic updates and uptime monitoring</li>
+          <li>90-day cost history</li>
+          <li>Priority support</li>
+          <li class="muted">Team members</li>
+          <li class="muted">Per-agent budget allocation</li>
         </ul>
         <a href="#waitlist" class="pricing-btn solid">Join waitlist →</a>
       </div>
@@ -991,15 +1009,15 @@ footer {
           <span class="pricing-amount">$49</span>
           <span class="pricing-per">/mo</span>
         </div>
-        <p class="pricing-desc">Multi-agent fleet management for small teams.</p>
+        <p class="pricing-desc">Shared visibility and controls across your whole agent fleet.</p>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
           <li>Everything in Pro</li>
-          <li>Per-agent budget allocation</li>
-          <li>Slack integration</li>
           <li>Up to 5 team members</li>
-          <li>90-day cost history</li>
+          <li>Per-agent budget allocation</li>
+          <li>Shared Slack alerts channel</li>
           <li>CSV export</li>
+          <li>Unlimited cost history</li>
           <li>Priority support</li>
           <li class="muted">SSO / SAML</li>
         </ul>
