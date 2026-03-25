@@ -48,11 +48,22 @@ export function renderDashboard(): string {
   .settings-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
   input[type=number] { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; color: var(--text); font-size: 14px; }
-  input[type=number]:focus { outline: none; border-color: var(--accent); }
+  input[type=number]:focus, input[type=text]:focus, input[type=email]:focus, input[type=password]:focus { outline: none; border-color: var(--accent); }
+  input[type=text], input[type=email], input[type=password] { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; color: var(--text); font-size: 14px; }
   button { padding: 8px 16px; background: var(--accent); color: #000; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 4px; }
   button:hover { opacity: 0.85; }
+  button.ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  button.ghost:hover { border-color: var(--text); color: var(--text); }
   .empty { color: var(--muted); text-align: center; padding: 24px; font-size: 13px; }
   #last-updated { margin-left: auto; font-size: 12px; color: var(--muted); }
+  .alerts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .input-row { display: flex; gap: 8px; align-items: flex-end; }
+  .input-row input { flex: 1; }
+  .channel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .channel-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .status-pill { font-size: 11px; padding: 2px 8px; border-radius: 99px; font-weight: 600; }
+  .status-pill.on  { background: rgba(34,197,94,0.15);  color: var(--accent); }
+  .status-pill.off { background: rgba(115,115,115,0.12); color: var(--muted); }
 </style>
 </head>
 <body>
@@ -100,6 +111,47 @@ export function renderDashboard(): string {
       <button onclick="saveBudgets()">Save Budgets</button>
       <div id="budget-msg" style="font-size:12px;color:var(--accent);margin-top:8px;height:16px"></div>
     </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title">Alert Settings</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Get notified at 80% and 100% of your daily and monthly budgets.</p>
+    <div class="alerts-grid">
+
+      <div>
+        <div class="channel-header">
+          <span class="channel-title">Slack</span>
+          <span class="status-pill off" id="slack-status">Not configured</span>
+        </div>
+        <label>Webhook URL</label>
+        <div class="input-row" style="margin-bottom:8px">
+          <input type="text" id="input-slack" placeholder="https://hooks.slack.com/services/...">
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="saveAlerts()">Save</button>
+          <button class="ghost" onclick="testAlert('slack')">Send test</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="channel-header">
+          <span class="channel-title">Email</span>
+          <span class="status-pill off" id="email-status">Not configured</span>
+        </div>
+        <label>Alert email</label>
+        <input type="email" id="input-email" placeholder="you@example.com" style="margin-bottom:8px">
+        <label>Resend API key</label>
+        <div class="input-row" style="margin-bottom:8px">
+          <input type="password" id="input-resend" placeholder="re_••••••••">
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="saveAlerts()">Save</button>
+          <button class="ghost" onclick="testAlert('email')">Send test</button>
+        </div>
+      </div>
+
+    </div>
+    <div id="alert-msg" style="font-size:12px;color:var(--accent);margin-top:12px;height:16px"></div>
   </div>
 
   <div class="grid-2">
@@ -233,7 +285,51 @@ async function saveBudgets() {
   loadStats();
 }
 
+async function loadAlertSettings() {
+  try {
+    const res = await fetch('/api/alerts/settings');
+    const data = await res.json();
+    document.getElementById('input-slack').value = data.slack_webhook_url || '';
+    document.getElementById('input-email').value = data.alert_email || '';
+    if (data.resend_api_key) document.getElementById('input-resend').placeholder = data.resend_api_key;
+
+    const slackPill = document.getElementById('slack-status');
+    const emailPill = document.getElementById('email-status');
+    if (data.slack_webhook_url) { slackPill.textContent = 'Active'; slackPill.className = 'status-pill on'; }
+    if (data.alert_email && data.resend_api_key) { emailPill.textContent = 'Active'; emailPill.className = 'status-pill on'; }
+  } catch {}
+}
+
+async function saveAlerts() {
+  const slack = document.getElementById('input-slack').value.trim();
+  const email = document.getElementById('input-email').value.trim();
+  const resend = document.getElementById('input-resend').value.trim();
+  const payload = {};
+  if (slack) payload.slack_webhook_url = slack;
+  if (email) payload.alert_email = email;
+  if (resend && !resend.startsWith('•')) payload.resend_api_key = resend;
+  await fetch('/api/alerts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+  const msg = document.getElementById('alert-msg');
+  msg.textContent = 'Saved!';
+  setTimeout(() => msg.textContent = '', 2000);
+  loadAlertSettings();
+}
+
+async function testAlert(channel) {
+  const msg = document.getElementById('alert-msg');
+  msg.textContent = 'Sending test...';
+  try {
+    await fetch('/api/alerts/test', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ channel }) });
+    msg.textContent = 'Test sent! Check ' + channel + '.';
+  } catch {
+    msg.textContent = 'Test failed — check your settings.';
+    msg.style.color = 'var(--danger)';
+  }
+  setTimeout(() => { msg.textContent = ''; msg.style.color = 'var(--accent)'; }, 3000);
+}
+
 loadStats();
+loadAlertSettings();
 setInterval(loadStats, 10000);
 </script>
 </body>

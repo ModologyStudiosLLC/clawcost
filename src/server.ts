@@ -5,6 +5,7 @@ import { config } from './config.js';
 import { db, saveUsage, getSpendSince, getStats, getSetting, setSetting } from './db.js';
 import { calcCost } from './pricing.js';
 import { renderDashboard } from './dashboard.js';
+import { checkAndAlert } from './alerts.js';
 
 const app = Fastify({ logger: false });
 
@@ -28,6 +29,34 @@ app.post('/api/budgets', async (req, reply) => {
   const { daily, monthly } = JSON.parse(body.toString()) as { daily: number; monthly: number };
   if (daily > 0) setSetting('daily_budget', String(daily));
   if (monthly > 0) setSetting('monthly_budget', String(monthly));
+  reply.send({ ok: true });
+});
+
+app.post('/api/alerts', async (req, reply) => {
+  const body = req.body as Buffer;
+  const data = JSON.parse(body.toString()) as Record<string, string>;
+  const allowed = ['slack_webhook_url', 'alert_email', 'resend_api_key'];
+  for (const key of allowed) {
+    if (data[key] !== undefined) setSetting(key, data[key]);
+  }
+  reply.send({ ok: true });
+});
+
+app.get('/api/alerts/settings', async (_req, reply) => {
+  reply.send({
+    slack_webhook_url: getSetting('slack_webhook_url') ?? '',
+    alert_email: getSetting('alert_email') ?? '',
+    resend_api_key: getSetting('resend_api_key') ? '••••••••' : '',
+  });
+});
+
+app.post('/api/alerts/test', async (req, reply) => {
+  const body = req.body as Buffer;
+  const { channel } = JSON.parse(body.toString()) as { channel: 'slack' | 'email' };
+  const { checkAndAlert } = await import('./alerts.js');
+  // Send a test alert at 85% to trigger warning path
+  const dailyBudget = parseFloat(getSetting('daily_budget') ?? String(config.dailyBudgetUsd));
+  await checkAndAlert(dailyBudget * 0.85, dailyBudget, 0, 999);
   reply.send({ ok: true });
 });
 
@@ -296,10 +325,16 @@ function recordUsage(opts: {
     cost_usd: cost,
   });
 
-  const totalTokens = inputTokens + outputTokens;
   console.log(
     `[ClawCost] ${provider}/${model} | in:${inputTokens} out:${outputTokens} | $${cost.toFixed(5)} | session:${sessionId.slice(0, 8)}`,
   );
+
+  // Fire alerts asynchronously — don't block the response
+  const dailyBudget = parseFloat(getSetting('daily_budget') ?? String(config.dailyBudgetUsd));
+  const monthlyBudget = parseFloat(getSetting('monthly_budget') ?? String(config.monthlyBudgetUsd));
+  const daySpend = getSpendSince(Date.now() - 86_400_000);
+  const monthSpend = getSpendSince(Date.now() - 30 * 86_400_000);
+  checkAndAlert(daySpend, dailyBudget, monthSpend, monthlyBudget).catch(() => {});
 }
 
 export async function startServer(): Promise<void> {

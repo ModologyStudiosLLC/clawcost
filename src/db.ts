@@ -101,3 +101,13 @@ export function getSetting(key: string): string | undefined {
 export function setSetting(key: string, value: string): void {
   db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run(key, value);
 }
+
+export function shouldSendAlert(key: string, cooldownMs: number): boolean {
+  const lastTs = getSetting(key);
+  if (!lastTs) return true;
+  return Date.now() - parseInt(lastTs) > cooldownMs;
+}
+
+export function markAlertSent(key: string): void {
+  setSetting(key, String(Date.now()));
+}
