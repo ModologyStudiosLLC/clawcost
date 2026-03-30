@@ -595,6 +595,29 @@ section { position: relative; z-index: 1; }
   margin-bottom: 16px;
 }
 .cta-box p { font-size: 17px; color: var(--text2); margin-bottom: 36px; max-width: 440px; margin-left: auto; margin-right: auto; }
+
+/* ─── Waitlist form ──────────────────────────────────────────────────────── */
+.waitlist-form {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+  max-width: 440px; margin: 0 auto 24px;
+}
+.waitlist-form input[type="email"] {
+  flex: 1; min-width: 220px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); padding: 12px 16px;
+  color: var(--text); font-size: 15px; font-family: inherit;
+  outline: none; transition: border-color .2s;
+}
+.waitlist-form input[type="email"]:focus { border-color: var(--violet); }
+.waitlist-form input[type="email"]::placeholder { color: var(--text3); }
+.waitlist-form button {
+  background: var(--violet); color: #fff; border: none; cursor: pointer;
+  border-radius: var(--radius-sm); padding: 12px 20px;
+  font-size: 14px; font-weight: 600; font-family: inherit;
+  white-space: nowrap; transition: opacity .2s;
+}
+.waitlist-form button:hover { opacity: .88; }
+.waitlist-success { color: var(--green); font-size: 15px; display: none; margin-top: 8px; }
 .install-block {
   display: inline-flex; align-items: center; gap: 12px;
   background: #0a0a0c;
@@ -663,8 +686,8 @@ footer {
       <a href="#features" class="nav-link">Features</a>
       <a href="#how" class="nav-link">How it works</a>
       <a href="#pricing" class="nav-link">Pricing</a>
-      <a href="https://github.com/MJFlanigan5/clawcost" class="nav-link" target="_blank">GitHub</a>
-      <a href="https://github.com/MJFlanigan5/clawcost" class="nav-cta" target="_blank">
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-link" target="_blank">GitHub</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-cta" target="_blank">
         Get started free
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
       </a>
@@ -693,11 +716,11 @@ footer {
     </div>
     <div class="reveal reveal-delay-3">
       <div class="hero-actions">
-        <a href="https://github.com/MJFlanigan5/clawcost" class="btn-primary" target="_blank">
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="btn-primary" target="_blank">
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
           Get started free
         </a>
-        <a href="https://github.com/MJFlanigan5/clawcost" class="btn-secondary" target="_blank">
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="btn-secondary" target="_blank">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.29 9.42 7.86 10.95.57.1.78-.25.78-.56 0-.28-.01-1.02-.01-2-3.2.7-3.87-1.54-3.87-1.54-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.53-2.55-.29-5.23-1.28-5.23-5.68 0-1.25.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.17a10.9 10.9 0 012.87-.39c.97 0 1.95.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.58.23 2.75.11 3.04.73.8 1.18 1.83 1.18 3.08 0 4.41-2.69 5.38-5.25 5.67.41.35.77 1.05.77 2.11 0 1.53-.01 2.76-.01 3.13 0 .31.2.67.79.56A11.51 11.51 0 0023.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
           View on GitHub
         </a>
@@ -978,7 +1001,7 @@ footer {
           <li class="muted">Hosted — no server required</li>
           <li class="muted">Dashboard accessible from anywhere</li>
         </ul>
-        <a href="https://github.com/MJFlanigan5/clawcost" class="pricing-btn outline" target="_blank">View on GitHub →</a>
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="pricing-btn outline" target="_blank">View on GitHub →</a>
       </div>
 
       <div class="pricing-card featured reveal reveal-delay-2">
@@ -1033,18 +1056,25 @@ footer {
     <div class="cta-box reveal">
       <div class="section-label" style="justify-content:center;margin-bottom:20px">Get started</div>
       <h2><span class="grad-text">Never get a surprise<br>AI bill again.</span></h2>
-      <p>One command. One env var. Full control over what your agents spend.</p>
-      <div>
+      <p>One command. One env var. Full control over what your agents spend. Hosted version coming soon.</p>
+      <div style="margin-bottom:32px">
         <div class="install-block" title="Click to copy">
           <span>$</span> <code>npm install && npm run dev</code>
         </div>
       </div>
-      <div class="hero-actions" style="justify-content:center">
-        <a href="https://github.com/MJFlanigan5/clawcost" class="btn-primary" target="_blank">
+      <!-- Waitlist for hosted Pro/Team -->
+      <p style="font-size:13px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Get early access to the hosted version</p>
+      <form class="waitlist-form" id="waitlist-form" action="https://formspree.io/f/REPLACE_WITH_YOUR_FORM_ID" method="POST">
+        <input type="email" name="email" placeholder="you@company.com" required autocomplete="email">
+        <button type="submit">Join waitlist →</button>
+      </form>
+      <p class="waitlist-success" id="waitlist-success">✓ You're on the list — we'll email when the hosted version is ready.</p>
+      <div class="hero-actions" style="justify-content:center;margin-top:28px">
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="btn-primary" target="_blank">
           Get started free
           <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
-        <a href="https://github.com/MJFlanigan5/clawcost" class="btn-secondary" target="_blank">
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="btn-secondary" target="_blank">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.29 9.42 7.86 10.95.57.1.78-.25.78-.56 0-.28-.01-1.02-.01-2-3.2.7-3.87-1.54-3.87-1.54-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.53-2.55-.29-5.23-1.28-5.23-5.68 0-1.25.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.17a10.9 10.9 0 012.87-.39c.97 0 1.95.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.58.23 2.75.11 3.04.73.8 1.18 1.83 1.18 3.08 0 4.41-2.69 5.38-5.25 5.67.41.35.77 1.05.77 2.11 0 1.53-.01 2.76-.01 3.13 0 .31.2.67.79.56A11.51 11.51 0 0023.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
           Star on GitHub
         </a>
@@ -1062,8 +1092,8 @@ footer {
         ClawCost
       </a>
       <div class="footer-links">
-        <a href="https://github.com/MJFlanigan5/clawcost" class="footer-link" target="_blank">GitHub</a>
-        <a href="https://github.com/MJFlanigan5/clawcost/issues" class="footer-link" target="_blank">Issues</a>
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="footer-link" target="_blank">GitHub</a>
+        <a href="https://github.com/ModologyStudiosLLC/clawcost/issues" class="footer-link" target="_blank">Issues</a>
         <a href="#pricing" class="footer-link">Pricing</a>
       </div>
       <div class="footer-right">Built for the OpenClaw community</div>
@@ -1084,6 +1114,34 @@ document.querySelector('.install-block').addEventListener('click', function() {
   this.style.borderColor = 'rgba(34,197,94,0.5)';
   setTimeout(() => this.style.borderColor = '', 1200);
 });
+
+// Waitlist form
+const waitlistForm = document.getElementById('waitlist-form');
+const waitlistSuccess = document.getElementById('waitlist-success');
+if (waitlistForm) {
+  waitlistForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = waitlistForm.querySelector('button');
+    btn.textContent = 'Joining...';
+    btn.disabled = true;
+    try {
+      const data = new FormData(waitlistForm);
+      const res = await fetch(waitlistForm.action, {
+        method: 'POST', body: data, headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        waitlistForm.style.display = 'none';
+        waitlistSuccess.style.display = 'block';
+      } else {
+        btn.textContent = 'Try again';
+        btn.disabled = false;
+      }
+    } catch {
+      btn.textContent = 'Try again';
+      btn.disabled = false;
+    }
+  });
+}
 </script>
 </body>
 </html>
