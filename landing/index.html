@@ -1062,7 +1062,9 @@ footer {
       </div>
       <!-- Waitlist for hosted Pro/Team -->
       <p style="font-size:13px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Get early access to the hosted version</p>
-      <form class="waitlist-form" id="waitlist-form">
+      <form class="waitlist-form" id="waitlist-form" action="https://api.web3forms.com/submit" method="POST">
+        <input type="hidden" name="access_key" value="53b58fa6-a525-4ea1-a262-c0bf5992e602">
+        <input type="hidden" name="redirect" value="https://clawcost.michaeljamesflanigan.workers.dev/?success=true">
         <input type="email" name="email" placeholder="you@company.com" required autocomplete="email">
         <button type="submit">Join waitlist →</button>
       </form>
@@ -1113,30 +1115,13 @@ document.querySelector('.install-block').addEventListener('click', function() {
   setTimeout(() => this.style.borderColor = '', 1200);
 });
 
-// Waitlist form — client-side handler (stores email locally for now)
-const waitlistForm = document.getElementById('waitlist-form');
-const waitlistSuccess = document.getElementById('waitlist-success');
-if (waitlistForm) {
-  waitlistForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = waitlistForm.querySelector('input[name="email"]').value;
-    const btn = waitlistForm.querySelector('button');
-    btn.textContent = 'Joining...';
-    btn.disabled = true;
-
-    // Store in localStorage for now (replace with real endpoint later)
-    const signups = JSON.parse(localStorage.getItem('clawcost_signups') || '[]');
-    if (!signups.includes(email)) {
-      signups.push(email);
-      localStorage.setItem('clawcost_signups', JSON.stringify(signups));
-    }
-
-    // Show success
-    setTimeout(() => {
-      waitlistForm.style.display = 'none';
-      waitlistSuccess.style.display = 'block';
-    }, 500);
-  });
+// Waitlist form — Web3Forms handles submission natively
+// Just show success message after redirect back
+if (window.location.search.includes('success')) {
+  const waitlistForm = document.getElementById('waitlist-form');
+  const waitlistSuccess = document.getElementById('waitlist-success');
+  if (waitlistForm) waitlistForm.style.display = 'none';
+  if (waitlistSuccess) waitlistSuccess.style.display = 'block';
 }
 </script>
 </body>
