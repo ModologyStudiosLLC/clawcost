@@ -7,10 +7,21 @@ import { calcCost } from './pricing.js';
 import { renderDashboard } from './dashboard.js';
 import { checkAndAlert } from './alerts.js';
 
+import { requireDashboardAuth } from './auth.js';
+import { calcCost as calcCostDynamic, getPricing, getAllPricing, getPricingMeta, loadPricing } from './pricing_dynamic.js';
+import { exportCsv, exportJson, exportSummary } from './export.js';
+
 const app = Fastify({ logger: false });
 
 // Raw body passthrough for all content types
 app.addContentTypeParser('*', { parseAs: 'buffer' }, (_req, body, done) => done(null, body));
+
+// ── Auth hook for all API routes (except proxy /v1/*) ─────────────────────
+app.addHook('preHandler', async (req, reply) => {
+  if (req.url.startsWith('/v1/') || req.url === '/' || req.url.startsWith('/assets')) return;
+  requireDashboardAuth(req, reply, () => {});
+  if (reply.sent) return; // Auth failed, reply already sent
+});
 
 // ── Dashboard ──────────────────────────────────────────────────────────────
 app.get('/', async (_req, reply) => {
@@ -58,6 +69,116 @@ app.post('/api/alerts/test', async (req, reply) => {
   const dailyBudget = parseFloat(getSetting('daily_budget') ?? String(config.dailyBudgetUsd));
   await checkAndAlert(dailyBudget * 0.85, dailyBudget, 0, 999);
   reply.send({ ok: true });
+});
+
+// ── Dynamic Pricing API ───────────────────────────────────────────────────
+app.get('/api/pricing', async (_req, reply) => {
+  reply.send({
+    models: getAllPricing(),
+    meta: getPricingMeta(),
+  });
+});
+
+app.post('/api/pricing', async (req, reply) => {
+  const body = req.body as Buffer;
+  const data = JSON.parse(body.toString()) as Record<string, { input: number; output: number; cacheRead?: number; cacheWrite?: number }>;
+  for (const [model, pricing] of Object.entries(data)) {
+    const { updatePricing } = await import('./pricing_dynamic.js');
+    updatePricing(model, pricing);
+  }
+  reply.send({ ok: true, models: getAllPricing() });
+});
+
+// ── Data Export API ────────────────────────────────────────────────────────
+app.get('/api/export/csv', async (req, reply) => {
+  const url = new URL(req.url, 'http://localhost');
+  const days = parseInt(url.searchParams.get('days') ?? '30');
+  const model = url.searchParams.get('model') ?? undefined;
+  const csv = exportCsv(days, model);
+  reply.type('text/csv').header('Content-Disposition', `attachment; filename="clawcost-usage-${days}d.csv"`).send(csv);
+});
+
+app.get('/api/export/json', async (req, reply) => {
+  const url = new URL(req.url, 'http://localhost');
+  const days = parseInt(url.searchParams.get('days') ?? '30');
+  const model = url.searchParams.get('model') ?? undefined;
+  reply.send(exportJson(days, model));
+});
+
+app.get('/api/export/summary', async (req, reply) => {
+  const url = new URL(req.url, 'http://localhost');
+  const days = parseInt(url.searchParams.get('days') ?? '30');
+  reply.send(exportSummary(days));
+});
+
+// ── Harness / Optimization API ─────────────────────────────────────────────
+
+// Simple in-memory pattern tracker for the harness
+const usagePatterns: Map<string, { sessionId: string; model: string; count: number; totalInput: number; totalOutput: number; totalCost: number }> = new Map();
+
+function trackPattern(sessionId: string, model: string, inputTokens: number, outputTokens: number, cost: number) {
+  const key = `${sessionId}:${model}`;
+  const existing = usagePatterns.get(key);
+  if (existing) {
+    existing.count++;
+    existing.totalInput += inputTokens;
+    existing.totalOutput += outputTokens;
+    existing.totalCost += cost;
+  } else {
+    usagePatterns.set(key, { sessionId, model, count: 1, totalInput: inputTokens, totalOutput: outputTokens, totalCost: cost });
+  }
+}
+
+app.get('/api/optimizations', async (_req, reply) => {
+  const suggestions: any[] = [];
+  for (const [key, p] of usagePatterns) {
+    if (p.count < 5) continue;
+    const avgOutput = p.totalOutput / p.count;
+    // Detect: expensive model with short outputs
+    if ((p.model.includes('opus') || p.model.includes('o1')) && avgOutput < 500) {
+      suggestions.push({
+        type: 'model_downgrade',
+        severity: 'warning',
+        currentModel: p.model,
+        suggestedModel: p.model.includes('opus') ? 'claude-sonnet-4-6' : 'o3-mini',
+        reason: `${p.count} requests with avg ${Math.round(avgOutput)} output tokens on ${p.model}. A cheaper model could handle these.`,
+        estimatedSavings: p.totalCost * 0.7,
+        confidence: 0.7,
+      });
+    }
+    // Detect: session runaway
+    if (p.totalCost > 2.0 && p.count > 50) {
+      suggestions.push({
+        type: 'session_warning',
+        severity: 'critical',
+        currentModel: p.model,
+        reason: `Session ${p.sessionId.slice(0, 8)} has ${p.count} requests costing $${p.totalCost.toFixed(2)}.`,
+        estimatedSavings: p.totalCost * 0.3,
+        confidence: 0.9,
+      });
+    }
+  }
+  reply.send({
+    suggestions,
+    stats: {
+      totalPatterns: usagePatterns.size,
+      totalOptimizations: suggestions.length,
+      estimatedTotalSavings: suggestions.reduce((sum, s) => sum + (s.estimatedSavings ?? 0), 0),
+    },
+  });
+});
+
+app.get('/api/recommend/:taskType', async (req, reply) => {
+  const taskType = (req.params as any).taskType;
+  const recommendations: Record<string, { model: string; reason: string }> = {
+    simple_qa: { model: 'gpt-4o-mini', reason: 'Cheapest fast model for simple Q&A' },
+    summarization: { model: 'claude-haiku-4-5', reason: 'Fast and cheap for text processing' },
+    chat: { model: 'claude-sonnet-4-6', reason: 'Best balance of quality and cost for conversation' },
+    coding: { model: 'claude-sonnet-4-6', reason: 'Strong coding at balanced price' },
+    reasoning: { model: 'claude-opus-4-6', reason: 'Most capable for complex reasoning' },
+  };
+  const rec = recommendations[taskType] ?? { model: 'claude-sonnet-4-6', reason: 'Default balanced recommendation' };
+  reply.send({ taskType, ...rec });
 });
 
 // ── Proxy ──────────────────────────────────────────────────────────────────
@@ -324,6 +445,9 @@ function recordUsage(opts: {
     cache_write_tokens: cacheWriteTokens,
     cost_usd: cost,
   });
+
+  // Track pattern for harness optimization
+  trackPattern(sessionId, model, inputTokens, outputTokens, cost);
 
   console.log(
     `[ClawCost] ${provider}/${model} | in:${inputTokens} out:${outputTokens} | $${cost.toFixed(5)} | session:${sessionId.slice(0, 8)}`,
