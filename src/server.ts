@@ -2,7 +2,7 @@ import Fastify from 'fastify';
 import https from 'https';
 import http from 'http';
 import { config } from './config.js';
-import { saveUsage, getSpendSince, getStats, getSetting, setSetting } from './db.js';
+import { saveUsage, getSpendSince, getStats, getSetting, setSetting, hasActiveLicense, setModelBudget, getModelBudgets, getModelBudget, getModelSpendSince, deleteModelBudget } from './db.js';
 import { calcCost } from './pricing.js';
 import { renderDashboard } from './dashboard.js';
 import { checkAndAlert } from './alerts.js';
@@ -66,10 +66,19 @@ app.get('/', async (_req, reply) => {
 });
 
 app.get('/api/stats', async (_req, reply) => {
-  const stats = getStats();
+  // Pro: 90-day history window. Free: 30 days.
+  const historyDays = hasActiveLicense() ? 90 : 30;
+  const stats = getStats(historyDays);
   const dailyBudget = parseFloat(getSetting('daily_budget') ?? String(config.dailyBudgetUsd));
   const monthlyBudget = parseFloat(getSetting('monthly_budget') ?? String(config.monthlyBudgetUsd));
-  reply.send({ ...stats, budgets: { daily: dailyBudget, monthly: monthlyBudget } });
+  const warningThreshold = hasActiveLicense()
+    ? parseFloat(getSetting('alert_threshold_warning') ?? '80')
+    : 80;
+  reply.send({
+    ...stats,
+    budgets: { daily: dailyBudget, monthly: monthlyBudget },
+    pro: { active: hasActiveLicense(), history_days: historyDays, warning_threshold: warningThreshold },
+  });
 });
 
 // ── Budget status (for external checks e.g. mimo-proxy) ───────────────────
@@ -138,7 +147,9 @@ app.post('/api/budgets', async (req, reply) => {
 
 app.post('/api/alerts', async (req, reply) => {
   const data = req.body as Record<string, string>;
-  const allowed = ['slack_webhook_url', 'discord_webhook_url', 'alert_email', 'resend_api_key'];
+  const freeKeys = ['slack_webhook_url', 'discord_webhook_url', 'alert_email', 'resend_api_key'];
+  const proKeys = ['alert_threshold_warning', 'alert_webhook_url'];
+  const allowed = hasActiveLicense() ? [...freeKeys, ...proKeys] : freeKeys;
   for (const key of allowed) {
     if (data[key] !== undefined) setSetting(key, data[key]);
   }
@@ -146,17 +157,56 @@ app.post('/api/alerts', async (req, reply) => {
 });
 
 app.get('/api/alerts/settings', async (_req, reply) => {
+  const isPro = hasActiveLicense();
   reply.send({
     slack_webhook_url: getSetting('slack_webhook_url') ?? '',
     discord_webhook_url: getSetting('discord_webhook_url') ?? '',
     alert_email: getSetting('alert_email') ?? '',
     resend_api_key: getSetting('resend_api_key') ? '••••••••' : '',
+    ...(isPro && {
+      alert_threshold_warning: parseInt(getSetting('alert_threshold_warning') ?? '80'),
+      alert_webhook_url: getSetting('alert_webhook_url') ?? '',
+    }),
   });
 });
 
 app.post('/api/alerts/test', async (_req, reply) => {
   const dailyBudget = parseFloat(getSetting('daily_budget') ?? String(config.dailyBudgetUsd));
   await checkAndAlert(dailyBudget * 0.85, dailyBudget, 0, 999);
+  reply.send({ ok: true });
+});
+
+// ── Pro: Model Budgets ─────────────────────────────────────────────────────
+
+app.get('/api/budgets/models', async (_req, reply) => {
+  if (!hasActiveLicense()) {
+    reply.code(403).send({ ok: false, error: 'Per-model budgets require ClawCost Pro.' });
+    return;
+  }
+  reply.send({ budgets: getModelBudgets() });
+});
+
+app.post('/api/budgets/models', async (req, reply) => {
+  if (!hasActiveLicense()) {
+    reply.code(403).send({ ok: false, error: 'Per-model budgets require ClawCost Pro.' });
+    return;
+  }
+  const { model, daily_limit, monthly_limit } = req.body as { model: string; daily_limit?: number | null; monthly_limit?: number | null };
+  if (!model) {
+    reply.code(400).send({ ok: false, error: 'model is required' });
+    return;
+  }
+  setModelBudget(model, daily_limit ?? null, monthly_limit ?? null);
+  reply.send({ ok: true });
+});
+
+app.delete('/api/budgets/models/:model', async (req, reply) => {
+  if (!hasActiveLicense()) {
+    reply.code(403).send({ ok: false, error: 'Per-model budgets require ClawCost Pro.' });
+    return;
+  }
+  const { model } = req.params as { model: string };
+  deleteModelBudget(model);
   reply.send({ ok: true });
 });
 
@@ -358,6 +408,38 @@ app.all('/v1/*', async (req, reply) => {
     console.log(`[ClawCost] BLOCKED: ${msg}`);
     reply.code(429).send({ type: 'error', error: { type: 'budget_exceeded', message: msg } });
     return;
+  }
+
+  // Pro: per-model budget check
+  if (hasActiveLicense()) {
+    const body = req.body as Buffer;
+    try {
+      const parsed = JSON.parse(body.toString()) as Record<string, unknown>;
+      const requestedModel = parsed['model'] as string | undefined;
+      if (requestedModel) {
+        const modelBudget = getModelBudget(requestedModel);
+        if (modelBudget) {
+          if (modelBudget.daily_limit != null) {
+            const modelDay = getModelSpendSince(requestedModel, Date.now() - 86_400_000);
+            if (modelDay >= modelBudget.daily_limit) {
+              const msg = `ClawCost: Daily budget for ${requestedModel} exceeded ($${modelDay.toFixed(4)} / $${modelBudget.daily_limit.toFixed(2)})`;
+              console.log(`[ClawCost] BLOCKED (model): ${msg}`);
+              reply.code(429).send({ type: 'error', error: { type: 'model_budget_exceeded', message: msg } });
+              return;
+            }
+          }
+          if (modelBudget.monthly_limit != null) {
+            const modelMonth = getModelSpendSince(requestedModel, Date.now() - 30 * 86_400_000);
+            if (modelMonth >= modelBudget.monthly_limit) {
+              const msg = `ClawCost: Monthly budget for ${requestedModel} exceeded ($${modelMonth.toFixed(4)} / $${modelBudget.monthly_limit.toFixed(2)})`;
+              console.log(`[ClawCost] BLOCKED (model): ${msg}`);
+              reply.code(429).send({ type: 'error', error: { type: 'model_budget_exceeded', message: msg } });
+              return;
+            }
+          }
+        }
+      }
+    } catch { /* non-JSON body, skip model check */ }
   }
 
   const sessionId = (req.headers['x-session-id'] as string | undefined) ?? 'unknown';

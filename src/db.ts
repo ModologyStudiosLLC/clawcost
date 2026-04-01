@@ -42,6 +42,13 @@ db.exec(`
     created_at INTEGER NOT NULL,
     cancelled_at INTEGER
   );
+
+  CREATE TABLE IF NOT EXISTS model_budgets (
+    model TEXT PRIMARY KEY,
+    daily_limit REAL,
+    monthly_limit REAL,
+    updated_at INTEGER NOT NULL
+  );
 `);
 
 export interface UsageRow {
@@ -72,10 +79,10 @@ export function getSpendSince(sinceTs: number): number {
   return row?.total ?? 0;
 }
 
-export function getStats() {
+export function getStats(historyDays = 30) {
   const now = Date.now();
   const dayAgo = now - 86_400_000;
-  const monthAgo = now - 30 * 86_400_000;
+  const monthAgo = now - historyDays * 86_400_000;
 
   const today = db.prepare<[number], { cost: number | null; requests: number; input_tokens: number | null; output_tokens: number | null }>(
     `SELECT SUM(cost_usd) as cost, COUNT(*) as requests, SUM(input_tokens) as input_tokens, SUM(output_tokens) as output_tokens FROM usage WHERE ts >= ?`
@@ -95,14 +102,31 @@ export function getStats() {
      FROM usage WHERE ts >= ? GROUP BY session_id ORDER BY last_ts DESC LIMIT 20`
   ).all(dayAgo);
 
-  // 7-day history
-  const history = db.prepare<[], { date: string; cost: number; requests: number }>(
+  // History chart
+  const history = db.prepare<[number], { date: string; cost: number; requests: number }>(
     `SELECT date(ts/1000, 'unixepoch') as date, SUM(cost_usd) as cost, COUNT(*) as requests
-     FROM usage WHERE ts >= ${now - 7 * 86_400_000}
-     GROUP BY date ORDER BY date ASC`
-  ).all();
+     FROM usage WHERE ts >= ? GROUP BY date ORDER BY date ASC`
+  ).all(monthAgo);
 
-  return { today, month, byModel, bySessions, history };
+  // Cost forecasting — project end-of-month spend based on current pace
+  const calendarNow = new Date();
+  const daysElapsed = calendarNow.getDate();
+  const daysInMonth = new Date(calendarNow.getFullYear(), calendarNow.getMonth() + 1, 0).getDate();
+  const calMonthStart = new Date(calendarNow.getFullYear(), calendarNow.getMonth(), 1).getTime();
+  const monthToDate = db.prepare<[number], { cost: number | null }>(
+    `SELECT SUM(cost_usd) as cost FROM usage WHERE ts >= ?`
+  ).get(calMonthStart);
+  const mtdSpend = monthToDate?.cost ?? 0;
+  const dailyRate = daysElapsed > 0 ? mtdSpend / daysElapsed : 0;
+  const forecast = {
+    mtd_spend: mtdSpend,
+    daily_rate: dailyRate,
+    projected_month_end: dailyRate * daysInMonth,
+    days_elapsed: daysElapsed,
+    days_in_month: daysInMonth,
+  };
+
+  return { today, month, byModel, bySessions, history, forecast };
 }
 
 export function getSetting(key: string): string | undefined {
@@ -160,4 +184,37 @@ export function getActiveLicenses(): LicenseRow[] {
 export function hasActiveLicense(): boolean {
   const row = db.prepare<[string], { count: number }>('SELECT COUNT(*) as count FROM licenses WHERE status = ?').get('active');
   return (row?.count ?? 0) > 0;
+}
+
+// ── Model budgets (Pro) ───────────────────────────────────────────────────
+
+export interface ModelBudget {
+  model: string;
+  daily_limit: number | null;
+  monthly_limit: number | null;
+  updated_at: number;
+}
+
+export function setModelBudget(model: string, daily_limit: number | null, monthly_limit: number | null): void {
+  db.prepare(`INSERT OR REPLACE INTO model_budgets (model, daily_limit, monthly_limit, updated_at) VALUES (?, ?, ?, ?)`)
+    .run(model, daily_limit, monthly_limit, Date.now());
+}
+
+export function getModelBudgets(): ModelBudget[] {
+  return db.prepare<[], ModelBudget>('SELECT * FROM model_budgets ORDER BY model ASC').all();
+}
+
+export function getModelBudget(model: string): ModelBudget | undefined {
+  return db.prepare<[string], ModelBudget>('SELECT * FROM model_budgets WHERE model = ?').get(model);
+}
+
+export function getModelSpendSince(model: string, sinceTs: number): number {
+  const row = db.prepare<[string, number], { total: number | null }>(
+    'SELECT SUM(cost_usd) as total FROM usage WHERE model = ? AND ts >= ?'
+  ).get(model, sinceTs);
+  return row?.total ?? 0;
+}
+
+export function deleteModelBudget(model: string): void {
+  db.prepare('DELETE FROM model_budgets WHERE model = ?').run(model);
 }

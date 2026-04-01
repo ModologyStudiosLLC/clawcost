@@ -1,4 +1,4 @@
-import { getSetting, shouldSendAlert, markAlertSent } from './db.js';
+import { getSetting, shouldSendAlert, markAlertSent, hasActiveLicense } from './db.js';
 
 export interface AlertPayload {
   event: 'budget_warning' | 'budget_blocked';
@@ -62,10 +62,15 @@ export async function checkAndAlert(
     },
   ];
 
+  // Pro: configurable warning threshold. Free: fixed at 80%.
+  const warningThreshold = hasActiveLicense()
+    ? parseFloat(getSetting('alert_threshold_warning') ?? '80') / 100
+    : 0.8;
+
   for (const check of checks) {
     const isWarning = check.payload.event === 'budget_warning';
     const isBlocked = check.payload.event === 'budget_blocked';
-    const overWarning = check.payload.pct >= 0.8 && check.payload.pct < 1.0;
+    const overWarning = check.payload.pct >= warningThreshold && check.payload.pct < 1.0;
     const overBudget = check.payload.pct >= 1.0;
 
     if ((isWarning && !overWarning) || (isBlocked && !overBudget)) continue;
@@ -77,7 +82,33 @@ export async function checkAndAlert(
 }
 
 async function sendAlerts(payload: AlertPayload): Promise<void> {
-  await Promise.allSettled([sendSlack(payload), sendDiscord(payload), sendEmail(payload)]);
+  await Promise.allSettled([sendSlack(payload), sendDiscord(payload), sendEmail(payload), sendWebhook(payload)]);
+}
+
+// ── Generic outbound webhook (Pro) ────────────────────────────────────────
+async function sendWebhook(payload: AlertPayload): Promise<void> {
+  if (!hasActiveLicense()) return;
+  const webhookUrl = getSetting('alert_webhook_url');
+  if (!webhookUrl) return;
+
+  try {
+    const res = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event: payload.event,
+        period: payload.period,
+        spent: payload.spent,
+        budget: payload.budget,
+        pct: payload.pct,
+        timestamp: new Date().toISOString(),
+        source: 'clawcost',
+      }),
+    });
+    if (!res.ok) console.error(`[ClawCost] Webhook alert failed: ${res.status}`);
+  } catch (err) {
+    console.error('[ClawCost] Webhook alert error:', err);
+  }
 }
 
 // ── Discord ───────────────────────────────────────────────────────────────
