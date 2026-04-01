@@ -6,7 +6,7 @@ import { saveUsage, getSpendSince, getStats, getSetting, setSetting, hasActiveLi
 import { calcCost } from './pricing.js';
 import { renderDashboard } from './dashboard.js';
 import { checkAndAlert } from './alerts.js';
-import { createCheckoutSession, createPortalSession, handleWebhook, getLicenseStatus, STRIPE_SETTING_KEYS } from './billing.js';
+import { createCheckoutSession, createPortalSession, handleWebhook, getLicenseStatus, activateByEmail, STRIPE_SETTING_KEYS } from './billing.js';
 
 import { requireDashboardAuth } from './auth.js';
 import { calcCost as calcCostDynamic, getPricing, getAllPricing, getPricingMeta, loadPricing } from './pricing_dynamic.js';
@@ -271,6 +271,20 @@ app.post('/billing/webhook', async (req, reply) => {
 
 app.get('/api/billing/status', async (_req, reply) => {
   reply.send(getLicenseStatus());
+});
+
+app.post('/api/billing/activate', async (req, reply) => {
+  const { email } = JSON.parse((req.body as Buffer).toString()) as { email: string };
+  if (!email?.trim()) {
+    reply.code(400).send({ ok: false, message: 'Email is required.' });
+    return;
+  }
+  try {
+    const result = await activateByEmail(email);
+    reply.send(result);
+  } catch (err) {
+    reply.code(500).send({ ok: false, message: String(err) });
+  }
 });
 
 app.post('/api/billing/settings', async (req, reply) => {

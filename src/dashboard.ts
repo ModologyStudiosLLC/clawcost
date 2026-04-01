@@ -292,12 +292,20 @@ export function renderDashboard(): string {
     </div>
   </div>
 
-  <!-- Upgrade prompt (shown when not Pro) -->
+  <!-- Upgrade / Activate prompt (shown when not Pro) -->
   <div id="upgrade-prompt" style="display:none;margin-top:8px">
     <div class="pro-gate">
       <h3>Unlock Pro features</h3>
       <p>Per-model budgets, 90-day history, custom alert thresholds, cost forecasting, and outbound webhooks.</p>
       <a href="https://buy.stripe.com/8x214ocjp83lapTafG2Fa01" target="_blank">Upgrade to Pro — $19/mo →</a>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Already purchased? Enter your purchase email to activate.</p>
+        <div style="display:flex;gap:8px;max-width:420px;margin:0 auto">
+          <input type="email" id="activate-email" placeholder="you@example.com" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12)">
+          <button onclick="activatePro()" style="white-space:nowrap">Activate Pro</button>
+        </div>
+        <div class="msg" id="activate-msg" style="margin-top:8px"></div>
+      </div>
     </div>
   </div>
 
@@ -532,6 +540,28 @@ async function addModelBudget() {
 async function removeModelBudget(model) {
   await fetch('/api/budgets/models/' + encodeURIComponent(model), { method: 'DELETE' });
   loadModelBudgets();
+}
+
+async function activatePro() {
+  const email = document.getElementById('activate-email').value.trim();
+  if (!email) { flash('activate-msg', 'Enter your purchase email.', true); return; }
+  flash('activate-msg', 'Checking subscription...');
+  try {
+    const res = await fetch('/api/billing/activate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      flash('activate-msg', data.message);
+      setTimeout(() => loadStats(), 1500);
+    } else {
+      flash('activate-msg', data.message, true);
+    }
+  } catch {
+    flash('activate-msg', 'Activation failed — check your connection.', true);
+  }
 }
 
 function flash(id, msg, isError = false) {
