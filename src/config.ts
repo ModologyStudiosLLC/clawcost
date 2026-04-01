@@ -25,4 +25,5 @@ export const config = {
   dailyBudgetUsd: parseFloat(process.env.CLAWCOST_DAILY_BUDGET ?? '5.00'),
   monthlyBudgetUsd: parseFloat(process.env.CLAWCOST_MONTHLY_BUDGET ?? '50.00'),
   dataDir: process.env.CLAWCOST_DATA_DIR ?? path.join(os.homedir(), '.clawcost'),
+  dashboardKey: process.env.CLAWCOST_DASHBOARD_KEY ?? '', // Empty = no auth (backwards compatible)
 };

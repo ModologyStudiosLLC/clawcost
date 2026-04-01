@@ -1005,13 +1005,13 @@ footer {
       </div>
 
       <div class="pricing-card featured reveal reveal-delay-2">
-        <div class="pricing-badge">Founder Pricing — Locked Forever</div>
+        <div class="pricing-badge">Coming Soon</div>
         <div class="pricing-tier">Pro</div>
         <div class="pricing-price">
-          <span class="pricing-amount">$12</span>
-          <span class="pricing-per">/mo</span>
+          <span class="pricing-amount">Coming Soon</span>
+          <span class="pricing-per">hosted</span>
         </div>
-        <p class="pricing-desc">Support the project and lock in founder pricing. Get the hosted version the moment it ships — plus priority support and the premium setup guide now.</p>
+        <p class="pricing-desc">Hosted proxy with dashboard accessible from anywhere. Join the waitlist to get notified when it launches.</p>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
           <li>Hosted proxy — no server required <span style="color:var(--amber);font-size:11px;font-weight:600">COMING SOON</span></li>
@@ -1020,7 +1020,7 @@ footer {
           <li>Priority email support — today</li>
           <li>90-day cost history</li>
           <li>Automatic updates + uptime monitoring</li>
-          <li>Founder pricing locked for life</li>
+          <li>Coming soon — join the waitlist</li>
         </ul>
         <a href="https://buy.stripe.com/28E8wQ8394R969DgE42Fa00" class="pricing-btn solid" target="_blank">Get founder access — $12/mo →</a>
       </div>
@@ -1028,8 +1028,7 @@ footer {
       <div class="pricing-card reveal reveal-delay-3">
         <div class="pricing-tier">Team</div>
         <div class="pricing-price">
-          <span class="pricing-amount">$49</span>
-          <span class="pricing-per">/mo</span>
+          <span class="pricing-amount">Coming Soon</span>
         </div>
         <p class="pricing-desc">Shared visibility and budget controls across your whole agent fleet. Waitlist open now.</p>
         <div class="pricing-divider"></div>
@@ -1063,7 +1062,9 @@ footer {
       </div>
       <!-- Waitlist for hosted Pro/Team -->
       <p style="font-size:13px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Get early access to the hosted version</p>
-      <form class="waitlist-form" id="waitlist-form" action="https://formspree.io/f/REPLACE_WITH_YOUR_FORM_ID" method="POST">
+      <form class="waitlist-form" id="waitlist-form" action="https://api.web3forms.com/submit" method="POST">
+        <input type="hidden" name="access_key" value="53b58fa6-a525-4ea1-a262-c0bf5992e602">
+        <input type="hidden" name="redirect" value="https://getclawcost.com/?success=true">
         <input type="email" name="email" placeholder="you@company.com" required autocomplete="email">
         <button type="submit">Join waitlist →</button>
       </form>
@@ -1114,32 +1115,13 @@ document.querySelector('.install-block').addEventListener('click', function() {
   setTimeout(() => this.style.borderColor = '', 1200);
 });
 
-// Waitlist form
-const waitlistForm = document.getElementById('waitlist-form');
-const waitlistSuccess = document.getElementById('waitlist-success');
-if (waitlistForm) {
-  waitlistForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = waitlistForm.querySelector('button');
-    btn.textContent = 'Joining...';
-    btn.disabled = true;
-    try {
-      const data = new FormData(waitlistForm);
-      const res = await fetch(waitlistForm.action, {
-        method: 'POST', body: data, headers: { 'Accept': 'application/json' }
-      });
-      if (res.ok) {
-        waitlistForm.style.display = 'none';
-        waitlistSuccess.style.display = 'block';
-      } else {
-        btn.textContent = 'Try again';
-        btn.disabled = false;
-      }
-    } catch {
-      btn.textContent = 'Try again';
-      btn.disabled = false;
-    }
-  });
+// Waitlist form — Web3Forms handles submission natively
+// Just show success message after redirect back
+if (window.location.search.includes('success')) {
+  const waitlistForm = document.getElementById('waitlist-form');
+  const waitlistSuccess = document.getElementById('waitlist-success');
+  if (waitlistForm) waitlistForm.style.display = 'none';
+  if (waitlistSuccess) waitlistSuccess.style.display = 'block';
 }
 </script>
 </body>
