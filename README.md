@@ -1,25 +1,41 @@
 # ClawCost
 
-Real-time token cost tracking and budget enforcement proxy for OpenClaw.
+Real-time token cost tracking and budget enforcement proxy for any LLM API.
 
-Sits between OpenClaw and Anthropic/OpenAI. Tracks every token, enforces daily/monthly budgets, and shows a live dashboard — no OpenClaw plugins required.
+Sits between your app and OpenAI, Anthropic, Gemini, DeepSeek, or any OpenAI-compatible API. Tracks every token, enforces daily/monthly budgets, and shows a live dashboard — drop it in with a one-line config change, no code changes required.
 
-## Setup
+## Quick Start
 
 ```bash
 npm install
 npm run dev
 ```
 
-Then add one line to `~/.openclaw/.env`:
+Point your app's LLM base URL to ClawCost:
+
+```
+http://localhost:4100/v1
+```
+
+**Dashboard:** http://localhost:4100
+
+### Claude Code / OpenClaw
+
+Add to `~/.openclaw/.env`:
 
 ```
 ANTHROPIC_BASE_URL=http://localhost:4100/v1
 ```
 
-Restart OpenClaw. All Anthropic API calls now route through ClawCost.
+### OpenAI SDK
 
-**Dashboard:** http://localhost:4100
+```python
+client = OpenAI(base_url="http://localhost:4100/v1", api_key=os.environ["OPENAI_API_KEY"])
+```
+
+### Any OpenAI-compatible provider
+
+Set your SDK's `base_url` or `OPENAI_BASE_URL` env var to `http://localhost:4100/v1`. ClawCost routes to the correct upstream automatically based on the model name.
 
 ## Configuration
 
@@ -40,31 +56,23 @@ Budgets can also be updated live in the dashboard without restarting.
 
 ## How it works
 
-1. OpenClaw sends API requests to `http://localhost:4100/v1` instead of `api.anthropic.com`
+1. Your app sends API requests to `http://localhost:4100/v1` instead of the provider directly
 2. ClawCost checks current spend against your budgets — blocks with HTTP 429 if exceeded
 3. Forwards the request upstream and streams the response back with zero added latency
 4. Parses SSE events to extract token usage without buffering
 5. Saves usage + cost to a local SQLite database (`~/.clawcost/usage.db`)
 
-## Adding OpenAI support
+## ClawCost Pro
 
-Add to `~/.openclaw/.env`:
+[ClawCost Pro](https://getclawcost.com) ($19/mo) adds:
 
-```
-OPENAI_BASE_URL=http://localhost:4100/v1
-```
+- **Per-model budgets** — set independent limits for each model
+- **90-day history** — longer usage trends and cost analysis
+- **Spend forecasting** — projected month-end cost based on current burn rate
+- **Custom alert thresholds** — trigger warnings at any % of budget, not just 80%
+- **Outbound webhooks** — POST alerts to Slack, Discord, or any endpoint
 
-Or in `~/.openclaw/openclaw.json`:
-
-```json
-{
-  "models": {
-    "providers": {
-      "openai": { "baseUrl": "http://localhost:4100/v1" }
-    }
-  }
-}
-```
+After purchasing, enter your email in the Pro panel on the dashboard to activate.
 
 ## Production build
 
@@ -76,3 +84,7 @@ npm start
 ## Data
 
 All usage is stored locally at `~/.clawcost/usage.db` (SQLite). No data leaves your machine.
+
+## License
+
+MIT — [Modology Studios](https://modology.dev)
