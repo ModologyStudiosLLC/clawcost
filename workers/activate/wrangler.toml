@@ -1,0 +1,10 @@
+name = "clawcost-activate"
+main = "index.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+STRIPE_PRODUCT_ID = "prod_UG2SghuGm80B30"
+
+[[routes]]
+pattern = "activate.getclawcost.com/*"
+zone_name = "getclawcost.com"

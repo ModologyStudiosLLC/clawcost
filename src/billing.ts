@@ -99,51 +99,48 @@ export async function handleWebhook(rawBody: Buffer, signature: string): Promise
 }
 
 // ── Self-hosted activation ───────────────────────────────────────────────────
-// No central server — user enters their purchase email and we verify directly
-// against Stripe, then issue a local license.
+// Calls the ClawCost activation worker (Cloudflare) which holds the Stripe key.
+// This means new users don't need a Stripe key configured locally.
+
+const ACTIVATION_WORKER_URL = 'https://activate.getclawcost.com';
 
 export async function activateByEmail(email: string): Promise<{ ok: boolean; message: string }> {
-  const stripe = getStripe();
-  if (!stripe) return { ok: false, message: 'Stripe not configured on this instance.' };
-
   const normalizedEmail = email.trim().toLowerCase();
 
-  // Check if already activated with this email
+  // Already activated locally?
   const existing = getActiveLicenses().find(l => l.email.toLowerCase() === normalizedEmail);
   if (existing) return { ok: true, message: 'Pro already active for ' + email };
 
-  // Look up customer by email in Stripe
-  const customers = await stripe.customers.list({ email: normalizedEmail, limit: 5 });
-  if (!customers.data.length) {
-    return { ok: false, message: 'No Stripe account found for ' + email + '. Make sure you use the same email you purchased with.' };
+  // Call the activation worker
+  let result: { ok: boolean; message: string; customer_id?: string; subscription_id?: string };
+  try {
+    const res = await fetch(ACTIVATION_WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: normalizedEmail }),
+    });
+    result = await res.json() as typeof result;
+  } catch (err) {
+    return { ok: false, message: 'Could not reach activation server. Check your internet connection.' };
   }
 
-  // Check for an active subscription on any of their customer records
-  for (const customer of customers.data) {
-    const subs = await stripe.subscriptions.list({ customer: customer.id, status: 'active', limit: 10 });
-    const clawcostSub = subs.data.find(s =>
-      s.items.data.some(item => item.price.product === getSetting('stripe_product_id') || item.price.id === getSetting('stripe_price_id'))
-    );
+  if (!result.ok) return result;
 
-    if (clawcostSub) {
-      // Check not already stored
-      const bySubId = getLicenseBySubscription(clawcostSub.id);
-      if (bySubId) {
-        setSetting('active_license_key', bySubId.license_key);
-        setSetting('active_license_email', email);
-        return { ok: true, message: 'Pro activated for ' + email };
-      }
-
-      const licenseKey = generateLicenseKey();
-      createLicense(licenseKey, normalizedEmail, customer.id, clawcostSub.id);
-      setSetting('active_license_key', licenseKey);
-      setSetting('active_license_email', normalizedEmail);
-      console.log('[ClawCost] Pro activated via email lookup:', normalizedEmail);
-      return { ok: true, message: 'Pro activated for ' + email };
-    }
+  // Verified — issue local license
+  const subscriptionId = result.subscription_id!;
+  const existing2 = getLicenseBySubscription(subscriptionId);
+  if (existing2) {
+    setSetting('active_license_key', existing2.license_key);
+    setSetting('active_license_email', normalizedEmail);
+    return { ok: true, message: 'Pro activated for ' + email };
   }
 
-  return { ok: false, message: 'No active ClawCost Pro subscription found for ' + email + '. If you just purchased, wait a moment and try again.' };
+  const licenseKey = generateLicenseKey();
+  createLicense(licenseKey, normalizedEmail, result.customer_id!, subscriptionId);
+  setSetting('active_license_key', licenseKey);
+  setSetting('active_license_email', normalizedEmail);
+  console.log('[ClawCost] Pro activated:', normalizedEmail);
+  return { ok: true, message: 'Pro activated for ' + email };
 }
 
 // ── Status ───────────────────────────────────────────────────────────────────
