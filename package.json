@@ -6,10 +6,17 @@
   "author": "Modology Studios <hello@modology.dev>",
   "type": "module",
   "main": "dist/index.js",
+  "bin": {
+    "clawcost": "dist/index.js"
+  },
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "dev": "tsx src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js"
+    "build": "tsc && chmod +x dist/index.js",
+    "start": "node dist/index.js",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "better-sqlite3": "^11.0.0",

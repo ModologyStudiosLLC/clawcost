@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <radialGradient id="bg" cx="30%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#1e1045"/>
+      <stop offset="100%" stop-color="#060408"/>
+    </radialGradient>
+    <linearGradient id="clawG" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0%" stop-color="#ddd6fe"/>
+      <stop offset="50%" stop-color="#9333ea"/>
+      <stop offset="100%" stop-color="#5b21b6"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="22" result="blur"/>
+      <feFlood flood-color="#7c3aed" flood-opacity="0.5" result="c"/>
+      <feComposite in="c" in2="blur" operator="in" result="s"/>
+      <feMerge><feMergeNode in="s"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="dollarGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="16" result="blur"/>
+      <feFlood flood-color="#10b981" flood-opacity="0.65" result="c"/>
+      <feComposite in="c" in2="blur" operator="in" result="s"/>
+      <feMerge><feMergeNode in="s"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle grid lines -->
+  <line x1="0" y1="315" x2="1200" y2="315" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+  <line x1="600" y1="0" x2="600" y2="630" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+
+  <!-- Big icon mark — left side -->
+  <!-- Claw 1 -->
+  <path d="M 128 112 A 32 32 0 0 1 192 112 C 190 230 168 358 130 490 C 148 358 140 230 128 112 Z"
+    fill="url(#clawG)" filter="url(#glow)"/>
+  <!-- Claw 2 -->
+  <path d="M 228 82 A 32 32 0 0 1 292 82 C 290 208 268 344 228 492 C 248 344 240 208 228 82 Z"
+    fill="url(#clawG)" filter="url(#glow)"/>
+  <!-- Claw 3 -->
+  <path d="M 328 112 A 32 32 0 0 1 392 112 C 390 230 368 358 328 490 C 348 358 340 230 328 112 Z"
+    fill="url(#clawG)" filter="url(#glow)"/>
+
+  <!-- Dollar sign accent -->
+  <text x="368" y="548" font-family="-apple-system, 'Inter', sans-serif" font-size="148" font-weight="800" fill="#10b981" filter="url(#dollarGlow)">$</text>
+
+  <!-- Wordmark -->
+  <text x="500" y="298" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif"
+    font-size="118" font-weight="800" letter-spacing="-4" fill="#f0f0f4">Claw<tspan fill="#a855f7">Cost</tspan></text>
+
+  <!-- Tagline -->
+  <text x="502" y="370" font-family="-apple-system, 'Inter', sans-serif"
+    font-size="30" font-weight="400" fill="#8b8fa8" letter-spacing="0">
+    LLM cost tracking and budget enforcement
+  </text>
+
+  <!-- Bottom badge -->
+  <rect x="502" y="420" width="220" height="44" rx="22" fill="rgba(124,58,237,0.15)" stroke="rgba(124,58,237,0.4)" stroke-width="1.5"/>
+  <text x="612" y="449" font-family="-apple-system, 'Inter', sans-serif"
+    font-size="17" font-weight="600" fill="#c084fc" text-anchor="middle">getclawcost.com</text>
+</svg>
