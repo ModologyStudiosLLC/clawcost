@@ -30,6 +30,18 @@ db.exec(`
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS licenses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    license_key TEXT UNIQUE NOT NULL,
+    email TEXT NOT NULL,
+    stripe_customer_id TEXT,
+    stripe_subscription_id TEXT UNIQUE,
+    plan TEXT NOT NULL DEFAULT 'pro',
+    status TEXT NOT NULL DEFAULT 'active',
+    created_at INTEGER NOT NULL,
+    cancelled_at INTEGER
+  );
 `);
 
 export interface UsageRow {
@@ -110,4 +122,42 @@ export function shouldSendAlert(key: string, cooldownMs: number): boolean {
 
 export function markAlertSent(key: string): void {
   setSetting(key, String(Date.now()));
+}
+
+export interface LicenseRow {
+  id: number;
+  license_key: string;
+  email: string;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  plan: string;
+  status: string;
+  created_at: number;
+  cancelled_at: number | null;
+}
+
+export function createLicense(license_key: string, email: string, stripe_customer_id: string, stripe_subscription_id: string): LicenseRow {
+  return db.prepare<[string, string, string, string, number], LicenseRow>(
+    `INSERT INTO licenses (license_key, email, stripe_customer_id, stripe_subscription_id, plan, status, created_at)
+     VALUES (?, ?, ?, ?, 'pro', 'active', ?)
+     RETURNING *`
+  ).get(license_key, email, stripe_customer_id, stripe_subscription_id, Date.now())!;
+}
+
+export function getLicenseBySubscription(subscriptionId: string): LicenseRow | undefined {
+  return db.prepare<[string], LicenseRow>('SELECT * FROM licenses WHERE stripe_subscription_id = ?').get(subscriptionId);
+}
+
+export function cancelLicense(subscriptionId: string): void {
+  db.prepare('UPDATE licenses SET status = ?, cancelled_at = ? WHERE stripe_subscription_id = ?')
+    .run('cancelled', Date.now(), subscriptionId);
+}
+
+export function getActiveLicenses(): LicenseRow[] {
+  return db.prepare<[string], LicenseRow>('SELECT * FROM licenses WHERE status = ? ORDER BY created_at DESC').all('active');
+}
+
+export function hasActiveLicense(): boolean {
+  const row = db.prepare<[string], { count: number }>('SELECT COUNT(*) as count FROM licenses WHERE status = ?').get('active');
+  return (row?.count ?? 0) > 0;
 }

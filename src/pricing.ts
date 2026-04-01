@@ -25,6 +25,16 @@ const PRICING: Record<string, ModelPricing> = {
   // Gemini
   'gemini-2.5-pro':               { input: 1.25, output: 10,  cacheRead: 0.31,  cacheWrite: 0     },
   'gemini-2.0-flash':             { input: 0.10, output: 0.40, cacheRead: 0.025, cacheWrite: 0    },
+  // MiMo / Xiaomi (per million tokens)
+  'mimo-v2-pro':                  { input: 1,    output: 3,   cacheRead: 0.20,  cacheWrite: 0     },
+  // DeepSeek
+  'deepseek-chat':                { input: 0.27, output: 1.10, cacheRead: 0.07,  cacheWrite: 0    },
+  'deepseek-reasoner':            { input: 0.55, output: 2.19, cacheRead: 0.14,  cacheWrite: 0    },
+  // ZAI / GLM (free tier — $0 cost)
+  'glm-5':                        { input: 0,    output: 0,   cacheRead: 0,     cacheWrite: 0     },
+  'glm-4.7':                      { input: 0,    output: 0,   cacheRead: 0,     cacheWrite: 0     },
+  'glm-4.7-flash':                { input: 0,    output: 0,   cacheRead: 0,     cacheWrite: 0     },
+  'glm-4.7-flashx':               { input: 0,    output: 0,   cacheRead: 0,     cacheWrite: 0     },
 };
 
 // Fallback by prefix matching

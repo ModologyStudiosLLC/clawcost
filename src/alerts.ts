@@ -77,7 +77,51 @@ export async function checkAndAlert(
 }
 
 async function sendAlerts(payload: AlertPayload): Promise<void> {
-  await Promise.allSettled([sendSlack(payload), sendEmail(payload)]);
+  await Promise.allSettled([sendSlack(payload), sendDiscord(payload), sendEmail(payload)]);
+}
+
+// ── Discord ───────────────────────────────────────────────────────────────
+async function sendDiscord(payload: AlertPayload): Promise<void> {
+  const webhookUrl = getSetting('discord_webhook_url');
+  if (!webhookUrl) return;
+
+  const isBlocked = payload.event === 'budget_blocked';
+  const emoji = isBlocked ? '🛑' : '⚠️';
+  const color = isBlocked ? 0xef4444 : 0xf59e0b;
+  const title = isBlocked
+    ? `${payload.period} budget exceeded — requests are being blocked`
+    : `${payload.period} budget at ${Math.round(payload.pct * 100)}%`;
+  const description = isBlocked
+    ? `All API requests are now blocked until the next period or you raise your budget.`
+    : `You're at ${Math.round(payload.pct * 100)}% of your ${payload.period} budget. Requests will be blocked at 100%.`;
+
+  const body = {
+    embeds: [
+      {
+        color,
+        title: `${emoji} ClawCost — ${title}`,
+        description,
+        fields: [
+          { name: 'Spent', value: `$${payload.spent.toFixed(4)}`, inline: true },
+          { name: `${payload.period.charAt(0).toUpperCase() + payload.period.slice(1)} budget`, value: `$${payload.budget.toFixed(2)}`, inline: true },
+        ],
+        footer: { text: 'ClawCost · http://localhost:4100' },
+        timestamp: new Date().toISOString(),
+      },
+    ],
+  };
+
+  try {
+    const res = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) console.error(`[ClawCost] Discord alert failed: ${res.status}`);
+    else console.log(`[ClawCost] Discord alert sent: ${payload.event} (${payload.period})`);
+  } catch (err) {
+    console.error('[ClawCost] Discord alert error:', err);
+  }
 }
 
 // ── Slack ─────────────────────────────────────────────────────────────────

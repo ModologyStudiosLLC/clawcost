@@ -1,7 +1,9 @@
 {
   "name": "clawcost",
   "version": "0.1.0",
-  "description": "Token cost tracking and budget enforcement proxy for OpenClaw",
+  "description": "Self-hosted LLM cost tracking and budget enforcement proxy for any AI dev team",
+  "license": "MIT",
+  "author": "Modology Studios <hello@modology.dev>",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
@@ -11,7 +13,8 @@
   },
   "dependencies": {
     "better-sqlite3": "^11.0.0",
-    "fastify": "^5.0.0"
+    "fastify": "^5.0.0",
+    "stripe": "^21.0.1"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.0",

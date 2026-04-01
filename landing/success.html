@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to ClawCost Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070709;
+      --violet: #7c3aed;
+      --green: #10b981;
+      --text: #f0f0f4;
+      --text2: #8b8fa8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .card {
+      text-align: center;
+      max-width: 520px;
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 3rem 2.5rem;
+    }
+    .icon {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+    }
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--green);
+      margin-bottom: 0.75rem;
+    }
+    .subtitle {
+      color: var(--text2);
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    .steps {
+      text-align: left;
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .steps h3 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text2);
+      margin-bottom: 1rem;
+    }
+    .step {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+      margin-bottom: 0.875rem;
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .step:last-child { margin-bottom: 0; }
+    .step-num {
+      background: var(--violet);
+      color: #fff;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .step code {
+      background: rgba(255,255,255,0.08);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.82rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .btn {
+      display: inline-block;
+      background: var(--violet);
+      color: #fff;
+      padding: 0.75rem 1.75rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .doc-link {
+      display: block;
+      margin-top: 1rem;
+      color: var(--text2);
+      font-size: 0.85rem;
+      text-decoration: none;
+    }
+    .doc-link:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">🎉</div>
+    <h1>You're on ClawCost Pro</h1>
+    <p class="subtitle">
+      Payment confirmed. Check your inbox for a receipt.<br>
+      Here's how to get ClawCost running in under 5 minutes:
+    </p>
+
+    <div class="steps">
+      <h3>Quick Start</h3>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>Download and run ClawCost — it's a single binary that starts a local proxy on port <code>4100</code></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>Point your app's LLM base URL to <code>http://localhost:4100/v1</code> — no other code changes needed</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>Open the dashboard at <code>http://localhost:4100</code> to see spend, set budgets, and configure alerts</div>
+      </div>
+    </div>
+
+    <a href="https://github.com/modology-studios/clawcost" class="btn" target="_blank">View on GitHub →</a>
+    <a href="https://getclawcost.com" class="doc-link">← Back to getclawcost.com</a>
+  </div>
+</body>
+</html>
