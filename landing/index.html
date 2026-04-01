@@ -711,7 +711,7 @@ footer {
     </div>
     <div class="reveal reveal-delay-2">
       <p class="hero-sub">
-        ClawCost is a transparent proxy for OpenClaw that tracks every token in real time, enforces hard spending budgets, and shows you exactly where your money goes.
+        ClawCost is a transparent proxy that sits between your app and any LLM API — OpenAI, Anthropic, Gemini, DeepSeek — tracks every token in real time, enforces hard spending budgets, and shows you exactly where your money goes.
       </p>
     </div>
     <div class="reveal reveal-delay-3">
@@ -827,9 +827,9 @@ footer {
     <div class="problem-grid">
       <div>
         <div class="section-label reveal">The problem</div>
-        <h2 class="section-title reveal reveal-delay-1">OpenClaw doesn't stop spending when you're not watching.</h2>
+        <h2 class="section-title reveal reveal-delay-1">Your AI bill doesn't care that you weren't watching.</h2>
         <p class="section-sub reveal reveal-delay-2">
-          By default, OpenClaw loads full conversation history into context on every API call. With Claude Opus or Gemini 2.5 Pro, costs compound fast — and by the time you notice, the damage is done.
+          Every agent session, every background job, every retry — they all add up. With Claude Opus or Gemini 2.5 Pro, a few runaway sessions can cost hundreds of dollars before you even open your inbox. ClawCost blocks the spend before it happens.
         </p>
         <div class="bill-breakdown reveal reveal-delay-3">
           <div class="bill-item">
@@ -978,8 +978,8 @@ footer {
   <div class="container">
     <div style="text-align:center">
       <div class="section-label reveal" style="justify-content:center">Pricing</div>
-      <h2 class="section-title reveal reveal-delay-1">Free to run yourself.<br>Hosted tier coming soon.</h2>
-      <p class="section-sub reveal reveal-delay-2" style="margin:0 auto 0">The self-hosted version — including Slack and email alerts — is free forever. A managed hosted version with no server required is in early access.</p>
+      <h2 class="section-title reveal reveal-delay-1">Free to self-host.<br>Pro for teams who mean business.</h2>
+      <p class="section-sub reveal reveal-delay-2" style="margin:0 auto 0">Open source and free forever for individual devs. Upgrade to Pro for per-model budgets, 90-day history, cost forecasting, and custom alert thresholds.</p>
     </div>
 
     <div class="pricing-grid">
@@ -988,59 +988,63 @@ footer {
         <div class="pricing-price">
           <span class="pricing-amount">Free</span>
         </div>
-        <p class="pricing-desc">Self-host on your own machine. Full feature set including alerts — no limits, forever.</p>
+        <p class="pricing-desc">Self-host on your own machine. Full proxy and dashboard with alerts — no limits, forever.</p>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
-          <li>Proxy for Anthropic + OpenAI</li>
+          <li>Proxy for OpenAI, Anthropic, Gemini, DeepSeek</li>
           <li>Real-time per-model token tracking</li>
           <li>Hard daily + monthly budget blocks</li>
-          <li>Local SQLite — nothing leaves your machine</li>
+          <li>Local SQLite — data never leaves your machine</li>
           <li>Live dashboard at localhost</li>
-          <li>Slack webhook alerts at 80% + 100%</li>
-          <li>Email alerts via Resend</li>
-          <li class="muted">Hosted — no server required</li>
-          <li class="muted">Dashboard accessible from anywhere</li>
+          <li>Slack, Discord + email alerts</li>
+          <li>30-day cost history</li>
+          <li class="muted">90-day history</li>
+          <li class="muted">Per-model budgets</li>
+          <li class="muted">Cost forecasting</li>
         </ul>
         <a href="https://github.com/ModologyStudiosLLC/clawcost" class="pricing-btn outline" target="_blank">View on GitHub →</a>
       </div>
 
       <div class="pricing-card featured reveal reveal-delay-2">
-        <div class="pricing-badge">Coming Soon</div>
+        <div class="pricing-badge">Available now</div>
         <div class="pricing-tier">Pro</div>
         <div class="pricing-price">
-          <span class="pricing-amount">Coming Soon</span>
-          <span class="pricing-per">hosted</span>
+          <span class="pricing-amount">$19</span>
+          <span class="pricing-per">/mo</span>
         </div>
-        <p class="pricing-desc">Hosted proxy with dashboard accessible from anywhere. Join the waitlist to get notified when it launches.</p>
+        <p class="pricing-desc">Everything in Open Source, plus the controls serious teams need to stay on budget.</p>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
-          <li>Hosted proxy — no server required <span style="color:var(--amber);font-size:11px;font-weight:600">COMING SOON</span></li>
-          <li>Dashboard from any device <span style="color:var(--amber);font-size:11px;font-weight:600">COMING SOON</span></li>
-          <li>Premium setup guide — today</li>
-          <li>Priority email support — today</li>
+          <li>Everything in Open Source</li>
           <li>90-day cost history</li>
-          <li>Automatic updates + uptime monitoring</li>
-          <li>Coming soon — join the waitlist</li>
+          <li>Per-model budget caps — block claude-opus at $50/mo</li>
+          <li>Cost forecasting — projected month-end spend</li>
+          <li>Custom alert thresholds (any %, not just 80%)</li>
+          <li>Outbound webhook alerts to any endpoint</li>
+          <li>Priority email support</li>
+          <li class="muted">Team dashboard — coming soon</li>
         </ul>
-        <a href="https://buy.stripe.com/28E8wQ8394R969DgE42Fa00" class="pricing-btn solid" target="_blank">Get founder access — $12/mo →</a>
+        <a href="https://buy.stripe.com/8x214ocjp83lapTafG2Fa01" class="pricing-btn solid" target="_blank">Get Pro — $19/mo →</a>
       </div>
 
       <div class="pricing-card reveal reveal-delay-3">
+        <div class="pricing-badge" style="background:rgba(59,130,246,0.15);color:#60a5fa">Coming Soon</div>
         <div class="pricing-tier">Team</div>
         <div class="pricing-price">
-          <span class="pricing-amount">Coming Soon</span>
+          <span class="pricing-amount">$49</span>
+          <span class="pricing-per">/mo</span>
         </div>
-        <p class="pricing-desc">Shared visibility and budget controls across your whole agent fleet. Waitlist open now.</p>
+        <p class="pricing-desc">Shared cost visibility and budget controls across your entire engineering team.</p>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
           <li>Everything in Pro</li>
-          <li>Up to 5 team members</li>
-          <li>Per-agent budget allocation</li>
-          <li>Shared Slack alerts channel</li>
-          <li>CSV export</li>
+          <li>Up to 10 team members</li>
+          <li>Per-project budget allocation</li>
+          <li>Shared team dashboard</li>
           <li>Unlimited cost history</li>
-          <li>Priority support</li>
-          <li class="muted">SSO / SAML</li>
+          <li>CSV + JSON export</li>
+          <li>Audit log</li>
+          <li>Priority support + onboarding call</li>
         </ul>
         <a href="#waitlist" class="pricing-btn outline">Join waitlist →</a>
       </div>

@@ -297,7 +297,7 @@ export function renderDashboard(): string {
     <div class="pro-gate">
       <h3>Unlock Pro features</h3>
       <p>Per-model budgets, 90-day history, custom alert thresholds, cost forecasting, and outbound webhooks.</p>
-      <a href="https://buy.stripe.com/28E8wQ8394R969DgE42Fa00" target="_blank">Upgrade to Pro — $19/mo →</a>
+      <a href="https://buy.stripe.com/8x214ocjp83lapTafG2Fa01" target="_blank">Upgrade to Pro — $19/mo →</a>
     </div>
   </div>
 
