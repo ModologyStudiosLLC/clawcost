@@ -13,9 +13,6 @@ import { exportCsv, exportJson, exportSummary } from './export.js';
 
 const app = Fastify({ logger: false });
 
-// Raw body passthrough for all content types
-app.addContentTypeParser('*', { parseAs: 'buffer' }, (_req, body, done) => done(null, body));
-
 // ── Auth hook for all API routes (except proxy /v1/*) ─────────────────────
 app.addHook('preHandler', async (req, reply) => {
   if (req.url.startsWith('/v1/') || req.url === '/' || req.url.startsWith('/assets')) return;
@@ -36,16 +33,14 @@ app.get('/api/stats', async (_req, reply) => {
 });
 
 app.post('/api/budgets', async (req, reply) => {
-  const body = req.body as Buffer;
-  const { daily, monthly } = JSON.parse(body.toString()) as { daily: number; monthly: number };
+  const { daily, monthly } = req.body as { daily: number; monthly: number };
   if (daily > 0) setSetting('daily_budget', String(daily));
   if (monthly > 0) setSetting('monthly_budget', String(monthly));
   reply.send({ ok: true });
 });
 
 app.post('/api/alerts', async (req, reply) => {
-  const body = req.body as Buffer;
-  const data = JSON.parse(body.toString()) as Record<string, string>;
+  const data = req.body as Record<string, string>;
   const allowed = ['slack_webhook_url', 'alert_email', 'resend_api_key'];
   for (const key of allowed) {
     if (data[key] !== undefined) setSetting(key, data[key]);
@@ -62,8 +57,7 @@ app.get('/api/alerts/settings', async (_req, reply) => {
 });
 
 app.post('/api/alerts/test', async (req, reply) => {
-  const body = req.body as Buffer;
-  const { channel } = JSON.parse(body.toString()) as { channel: 'slack' | 'email' };
+  const { channel } = req.body as { channel: 'slack' | 'email' };
   const { checkAndAlert } = await import('./alerts.js');
   // Send a test alert at 85% to trigger warning path
   const dailyBudget = parseFloat(getSetting('daily_budget') ?? String(config.dailyBudgetUsd));
@@ -80,8 +74,7 @@ app.get('/api/pricing', async (_req, reply) => {
 });
 
 app.post('/api/pricing', async (req, reply) => {
-  const body = req.body as Buffer;
-  const data = JSON.parse(body.toString()) as Record<string, { input: number; output: number; cacheRead?: number; cacheWrite?: number }>;
+  const data = req.body as Record<string, { input: number; output: number; cacheRead?: number; cacheWrite?: number }>;
   for (const [model, pricing] of Object.entries(data)) {
     const { updatePricing } = await import('./pricing_dynamic.js');
     updatePricing(model, pricing);
