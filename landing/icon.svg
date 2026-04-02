@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <radialGradient id="bgGrad" cx="45%" cy="30%" r="65%">
-      <stop offset="0%" stop-color="#2a1654"/>
-      <stop offset="100%" stop-color="#06040f"/>
+    <radialGradient id="bgGrad" cx="40%" cy="25%" r="70%">
+      <stop offset="0%" stop-color="#1a1208"/>
+      <stop offset="100%" stop-color="#07080c"/>
     </radialGradient>
-    <linearGradient id="clawGrad" x1="0" y1="0" x2="0.3" y2="1">
-      <stop offset="0%" stop-color="#e0aaff"/>
-      <stop offset="55%" stop-color="#9333ea"/>
-      <stop offset="100%" stop-color="#5b21b6"/>
+    <linearGradient id="clawGrad" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0%" stop-color="#ffd060"/>
+      <stop offset="45%" stop-color="#e8961e"/>
+      <stop offset="100%" stop-color="#a86010"/>
     </linearGradient>
-    <filter id="clawGlow" x="-30%" y="-20%" width="160%" height="140%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="14" result="blur"/>
-      <feFlood flood-color="#a855f7" flood-opacity="0.55" result="color"/>
+    <filter id="clawGlow" x="-35%" y="-20%" width="170%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="16" result="blur"/>
+      <feFlood flood-color="#e8961e" flood-opacity="0.6" result="color"/>
       <feComposite in="color" in2="blur" operator="in" result="glow"/>
       <feMerge>
         <feMergeNode in="glow"/>
@@ -19,8 +19,8 @@
       </feMerge>
     </filter>
     <filter id="dollarGlow" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="blur"/>
-      <feFlood flood-color="#10b981" flood-opacity="0.7" result="color"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="10" result="blur"/>
+      <feFlood flood-color="#00d47e" flood-opacity="0.7" result="color"/>
       <feComposite in="color" in2="blur" operator="in" result="glow"/>
       <feMerge>
         <feMergeNode in="glow"/>
@@ -31,11 +31,9 @@
 
   <!-- Background -->
   <rect width="512" height="512" rx="108" fill="url(#bgGrad)"/>
+  <rect width="512" height="512" rx="108" fill="none" stroke="rgba(232,150,30,0.15)" stroke-width="2"/>
 
-  <!-- Subtle inner border -->
-  <rect width="512" height="512" rx="108" fill="none" stroke="rgba(168,85,247,0.18)" stroke-width="2"/>
-
-  <!-- Three tapered claw marks — filled paths with rounded top arc, tapering to sharp tip -->
+  <!-- Three tapered claw marks -->
 
   <!-- Claw 1 (left) -->
   <path
@@ -65,7 +63,7 @@
     font-family="-apple-system, 'Inter', 'Helvetica Neue', sans-serif"
     font-size="92"
     font-weight="800"
-    fill="#10b981"
+    fill="#00d47e"
     filter="url(#dollarGlow)"
   >$</text>
 </svg>
