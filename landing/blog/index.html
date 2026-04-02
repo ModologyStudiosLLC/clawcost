@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — ClawCost</title>
+<meta name="description" content="Guides, cost breakdowns, and practical advice for developers building with the Claude API.">
+<link rel="canonical" href="https://getclawcost.com/blog/">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #07080c; --surface: #0d0f18; --surface2: #131822;
+  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+  --text: #eaedf5; --text2: #8891a8; --text3: #484d68;
+  --brand: #e8961e; --brand2: #ffc04d; --green: #00d47e;
+  --radius: 14px; --radius-sm: 8px;
+}
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; }
+.container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+.bg-grid {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%);
+}
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border); background: rgba(7,8,12,0.85);
+}
+.nav-inner { display: flex; align-items: center; gap: 32px; height: 60px; }
+.nav-logo {
+  display: flex; align-items: center; gap: 10px; text-decoration: none;
+  color: var(--text); font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600; font-size: 16px; letter-spacing: -0.02em;
+}
+.nav-logo-mark {
+  width: 28px; height: 28px; border-radius: 7px; background: var(--brand);
+  display: grid; place-items: center; flex-shrink: 0;
+}
+.nav-links { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.nav-link {
+  color: var(--text2); text-decoration: none; font-size: 14px; font-weight: 500;
+  padding: 6px 12px; border-radius: var(--radius-sm);
+  transition: color 0.15s, background 0.15s;
+}
+.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.nav-cta {
+  background: var(--brand); color: #0a0a0e; font-weight: 600; font-size: 14px;
+  padding: 8px 18px; border-radius: var(--radius-sm); text-decoration: none;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.15s; margin-left: 8px;
+}
+.nav-cta:hover { background: var(--brand2); box-shadow: 0 0 32px rgba(232,150,30,0.5); transform: translateY(-1px); }
+.page-wrap { position: relative; z-index: 1; padding: 100px 0 96px; }
+.page-header { margin-bottom: 48px; }
+.page-header h1 { font-size: clamp(32px, 5vw, 52px); font-weight: 700; letter-spacing: -0.03em; margin-bottom: 12px; }
+.page-header p { font-size: 17px; color: var(--text2); }
+.post-list { display: flex; flex-direction: column; gap: 0; max-width: 760px; }
+.post-item {
+  display: block; text-decoration: none; padding: 28px 0;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.post-item:first-child { border-top: 1px solid var(--border); }
+.post-meta {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 12px; color: var(--text3); margin-bottom: 10px;
+}
+.post-tag {
+  background: rgba(232,150,30,0.12); color: var(--brand);
+  padding: 2px 8px; border-radius: 99px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.post-item h2 {
+  font-size: 20px; font-weight: 700; letter-spacing: -0.02em;
+  color: var(--text); margin-bottom: 8px; transition: color 0.15s;
+}
+.post-item:hover h2 { color: var(--brand); }
+.post-item p { font-size: 14px; color: var(--text2); line-height: 1.6; }
+.post-read { font-size: 13px; color: var(--brand); margin-top: 12px; font-weight: 500; }
+footer {
+  position: relative; z-index: 1;
+  border-top: 1px solid var(--border); padding: 32px 0;
+}
+.footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.footer-logo {
+  display: flex; align-items: center; gap: 8px; font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600; font-size: 15px; color: var(--text); text-decoration: none;
+}
+.footer-links { display: flex; gap: 24px; }
+.footer-link { color: var(--text3); text-decoration: none; font-size: 13px; transition: color 0.15s; }
+.footer-link:hover { color: var(--text2); }
+.footer-right { color: var(--text3); font-size: 13px; }
+@media (max-width: 640px) { .nav-links a:not(.nav-cta) { display: none; } }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<nav>
+  <div class="container nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg width="14" height="14" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      ClawCost
+    </a>
+    <div class="nav-links">
+      <a href="/#features" class="nav-link">Features</a>
+      <a href="/#pricing" class="nav-link">Pricing</a>
+      <a href="/blog/" class="nav-link" style="color:var(--brand)">Blog</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-link" target="_blank">GitHub</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-cta" target="_blank">Get started →</a>
+    </div>
+  </div>
+</nav>
+
+<main class="page-wrap">
+  <div class="container">
+    <div class="page-header">
+      <h1>Blog</h1>
+      <p>Guides, cost breakdowns, and practical advice for developers building with Claude.</p>
+    </div>
+    <div class="post-list">
+      <a href="/blog/claude-api-cost-breakdown/" class="post-item">
+        <div class="post-meta">
+          <span class="post-tag">Pricing</span>
+          <span>April 2026</span>
+          <span>·</span>
+          <span>10 min read</span>
+        </div>
+        <h2>How Much Does the Claude API Actually Cost? A Complete 2025 Breakdown</h2>
+        <p>Every model, real-world cost examples, discount mechanisms, and the decisions that actually move the needle on your Anthropic API bill. Includes pricing tables, three worked scenarios, and a quick-reference model selection guide.</p>
+        <div class="post-read">Read article →</div>
+      </a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a href="/" class="footer-logo">
+        <div class="nav-logo-mark" style="width:22px;height:22px">
+          <svg width="11" height="11" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        ClawCost
+      </a>
+      <div class="footer-links">
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="footer-link" target="_blank">GitHub</a>
+        <a href="/blog/" class="footer-link">Blog</a>
+        <a href="/#pricing" class="footer-link">Pricing</a>
+      </div>
+      <div class="footer-right">Built by Modology Studios</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Much Does the Claude API Actually Cost? A Complete 2025 Breakdown — ClawCost</title>
+<meta name="description" content="A complete breakdown of Claude API pricing in 2025 — every model, real-world cost examples, and practical tips to cut your Anthropic API spend.">
+<link rel="canonical" href="https://getclawcost.com/blog/claude-api-cost-breakdown/">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<meta property="og:title" content="How Much Does the Claude API Actually Cost? A Complete 2025 Breakdown">
+<meta property="og:description" content="A complete breakdown of Claude API pricing in 2025 — every model, real-world cost examples, and practical tips to cut your Anthropic API spend.">
+<meta property="og:image" content="https://getclawcost.com/og.png">
+<meta property="og:url" content="https://getclawcost.com/blog/claude-api-cost-breakdown/">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How Much Does the Claude API Actually Cost? A Complete 2025 Breakdown">
+<meta name="twitter:description" content="A complete breakdown of Claude API pricing in 2025 — every model, real-world cost examples, and practical tips to cut your Anthropic API spend.">
+<meta name="twitter:image" content="https://getclawcost.com/og.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ─── Reset ──────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+/* ─── Tokens ─────────────────────────────────────────────────────────────── */
+:root {
+  --bg:        #07080c;
+  --surface:   #0d0f18;
+  --surface2:  #131822;
+  --border:    rgba(255,255,255,0.07);
+  --border2:   rgba(255,255,255,0.12);
+  --text:      #eaedf5;
+  --text2:     #8891a8;
+  --text3:     #484d68;
+  --brand:     #e8961e;
+  --brand2:    #ffc04d;
+  --green:     #00d47e;
+  --radius:    14px;
+  --radius-sm: 8px;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+h1, h2, h3, h4 { font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif; }
+
+/* ─── Background dot grid ────────────────────────────────────────────────── */
+.bg-grid {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%);
+}
+
+/* ─── Layout ─────────────────────────────────────────────────────────────── */
+.container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+/* ─── Nav ────────────────────────────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  background: rgba(7,8,12,0.85);
+}
+.nav-inner { display: flex; align-items: center; gap: 32px; height: 60px; }
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; color: var(--text);
+  font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px;
+  letter-spacing: -0.02em;
+}
+.nav-logo-mark {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: var(--brand); display: grid; place-items: center; flex-shrink: 0;
+}
+.nav-links { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.nav-link {
+  color: var(--text2); text-decoration: none;
+  font-size: 14px; font-weight: 500; padding: 6px 12px; border-radius: var(--radius-sm);
+  transition: color 0.15s, background 0.15s;
+}
+.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.nav-cta {
+  background: var(--brand); color: #0a0a0e; font-weight: 600;
+  font-size: 14px; padding: 8px 18px; border-radius: var(--radius-sm);
+  text-decoration: none; transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+  margin-left: 8px;
+}
+.nav-cta:hover { background: var(--brand2); box-shadow: 0 0 32px rgba(232,150,30,0.5); transform: translateY(-1px); }
+
+/* ─── Article layout ─────────────────────────────────────────────────────── */
+.article-wrap {
+  position: relative; z-index: 1;
+  padding-top: 100px; padding-bottom: 96px;
+}
+.article-header {
+  max-width: 760px; margin: 0 auto 48px;
+}
+.article-breadcrumb {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--text3); margin-bottom: 20px;
+}
+.article-breadcrumb a { color: var(--text2); text-decoration: none; }
+.article-breadcrumb a:hover { color: var(--brand); }
+.article-breadcrumb span { color: var(--text3); }
+
+.article-meta {
+  display: flex; align-items: center; gap: 16px;
+  font-size: 13px; color: var(--text2); margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.article-tag {
+  background: rgba(232,150,30,0.12); color: var(--brand);
+  padding: 3px 10px; border-radius: 99px;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+}
+
+h1.article-title {
+  font-size: clamp(28px, 4vw, 46px);
+  font-weight: 700; line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--text); margin-bottom: 20px;
+}
+.article-subtitle {
+  font-size: 18px; color: var(--text2); line-height: 1.6;
+  max-width: 680px;
+}
+
+/* ─── Article body ────────────────────────────────────────────────────────── */
+.article-body {
+  max-width: 760px; margin: 0 auto;
+}
+.article-body p {
+  margin-bottom: 20px; color: var(--text); font-size: 16px; line-height: 1.75;
+}
+.article-body h2 {
+  font-size: 26px; font-weight: 700; letter-spacing: -0.025em;
+  margin-top: 52px; margin-bottom: 20px; color: var(--text);
+  border-bottom: 1px solid var(--border); padding-bottom: 12px;
+}
+.article-body h3 {
+  font-size: 19px; font-weight: 600; letter-spacing: -0.02em;
+  margin-top: 36px; margin-bottom: 14px; color: var(--text);
+}
+.article-body h4 {
+  font-size: 16px; font-weight: 600;
+  margin-top: 28px; margin-bottom: 10px; color: var(--text2);
+  text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px;
+}
+.article-body ul, .article-body ol {
+  margin: 0 0 20px 20px; color: var(--text); font-size: 16px; line-height: 1.75;
+}
+.article-body li { margin-bottom: 6px; }
+.article-body strong { color: var(--text); font-weight: 600; }
+.article-body em { color: var(--text2); font-style: italic; }
+.article-body a { color: var(--brand); text-decoration: none; }
+.article-body a:hover { text-decoration: underline; }
+.article-body hr {
+  border: none; border-top: 1px solid var(--border);
+  margin: 48px 0;
+}
+.article-body blockquote {
+  border-left: 3px solid var(--brand);
+  padding: 4px 20px;
+  margin: 24px 0;
+  color: var(--text2);
+  font-style: italic;
+}
+.article-body code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--brand2);
+}
+
+/* ─── Tables ─────────────────────────────────────────────────────────────── */
+.table-wrap {
+  overflow-x: auto;
+  margin: 28px 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+table {
+  width: 100%; border-collapse: collapse;
+  font-size: 14px; min-width: 480px;
+}
+thead tr {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border2);
+}
+thead th {
+  padding: 12px 16px; text-align: left;
+  font-weight: 600; color: var(--text2);
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em;
+}
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.02); }
+tbody td {
+  padding: 12px 16px; color: var(--text); vertical-align: middle;
+}
+.td-model { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text2); }
+.td-price { font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--brand2); }
+.td-cheap { color: var(--green); }
+.td-context { color: var(--text3); font-size: 13px; }
+
+/* ─── Callout boxes ──────────────────────────────────────────────────────── */
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--brand);
+  border-radius: var(--radius-sm);
+  padding: 20px 24px; margin: 32px 0;
+}
+.callout p { margin: 0; font-size: 15px; }
+.callout-title {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--brand); margin-bottom: 10px;
+}
+
+/* ─── CTA block ──────────────────────────────────────────────────────────── */
+.article-cta {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 40px; margin-top: 64px;
+  text-align: center;
+}
+.article-cta h3 {
+  font-size: 22px; font-weight: 700; margin-bottom: 12px; margin-top: 0;
+}
+.article-cta p {
+  color: var(--text2); margin-bottom: 24px; font-size: 15px;
+}
+.btn-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--brand); color: #0a0a0e;
+  font-weight: 700; font-size: 15px; padding: 12px 28px;
+  border-radius: var(--radius-sm); text-decoration: none;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+.btn-cta:hover {
+  background: var(--brand2);
+  box-shadow: 0 0 32px rgba(232,150,30,0.4);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+.btn-outline {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent; color: var(--text2);
+  font-weight: 500; font-size: 15px; padding: 12px 28px;
+  border-radius: var(--radius-sm); text-decoration: none;
+  border: 1px solid var(--border2);
+  transition: border-color 0.15s, color 0.15s;
+  margin-left: 12px;
+}
+.btn-outline:hover { border-color: var(--brand); color: var(--brand); text-decoration: none; }
+
+/* ─── Footer ─────────────────────────────────────────────────────────────── */
+footer {
+  position: relative; z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 32px 0;
+}
+.footer-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 24px; flex-wrap: wrap;
+}
+.footer-logo {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 15px;
+  color: var(--text); text-decoration: none; letter-spacing: -0.02em;
+}
+.footer-links { display: flex; gap: 24px; }
+.footer-link { color: var(--text3); text-decoration: none; font-size: 13px; transition: color 0.15s; }
+.footer-link:hover { color: var(--text2); }
+.footer-right { color: var(--text3); font-size: 13px; }
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .nav-links a:not(.nav-cta) { display: none; }
+  .article-wrap { padding-top: 84px; }
+  .article-body h2 { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<nav>
+  <div class="container nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg width="14" height="14" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      ClawCost
+    </a>
+    <div class="nav-links">
+      <a href="/#features" class="nav-link">Features</a>
+      <a href="/#pricing" class="nav-link">Pricing</a>
+      <a href="/blog/" class="nav-link" style="color:var(--brand)">Blog</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-link" target="_blank">GitHub</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-cta" target="_blank">Get started →</a>
+    </div>
+  </div>
+</nav>
+
+<main class="article-wrap">
+  <div class="container">
+    <div class="article-header">
+      <div class="article-breadcrumb">
+        <a href="/">ClawCost</a>
+        <span>›</span>
+        <a href="/blog/">Blog</a>
+        <span>›</span>
+        <span>Claude API Cost Breakdown</span>
+      </div>
+      <div class="article-meta">
+        <span class="article-tag">Pricing</span>
+        <span>April 2026</span>
+        <span>·</span>
+        <span>10 min read</span>
+      </div>
+      <h1 class="article-title">How Much Does the Claude API Actually Cost? A Complete 2025 Breakdown</h1>
+      <p class="article-subtitle">Every model, real-world cost examples, discount mechanisms, and the decisions that actually move the needle on your Anthropic API bill.</p>
+    </div>
+
+    <article class="article-body">
+
+      <p>If you're building with Claude, the pricing page alone won't tell you what you actually need to know. This post breaks down every model, every discount mechanism, and what real workloads actually cost — with no hand-waving.</p>
+
+      <hr>
+
+      <h2>The Short Answer</h2>
+
+      <p>Claude API pricing is token-based. You pay per million tokens (MTok) for input and output separately. Costs range from <strong>$0.25/MTok input</strong> on the cheapest legacy model to <strong>$5/MTok input</strong> on Claude Opus 4.6. Output tokens cost more than input tokens across all models.</p>
+
+      <p>The model you pick matters enormously. Haiku 4.5 costs 20x less than Opus 4.6 for the same token volume.</p>
+
+      <hr>
+
+      <h2>Current Claude API Pricing by Model</h2>
+
+      <p>All prices are in USD per million tokens (MTok), as of mid-2025.</p>
+
+      <h3>Current Generation Models</h3>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Input ($/MTok)</th>
+              <th>Output ($/MTok)</th>
+              <th>Context Window</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-model">claude-opus-4-6</td>
+              <td class="td-price">$5.00</td>
+              <td class="td-price">$25.00</td>
+              <td class="td-context">1M tokens</td>
+            </tr>
+            <tr>
+              <td class="td-model">claude-opus-4-5</td>
+              <td class="td-price">$5.00</td>
+              <td class="td-price">$25.00</td>
+              <td class="td-context">200K tokens</td>
+            </tr>
+            <tr>
+              <td class="td-model">claude-sonnet-4-6</td>
+              <td class="td-price">$3.00</td>
+              <td class="td-price">$15.00</td>
+              <td class="td-context">1M tokens</td>
+            </tr>
+            <tr>
+              <td class="td-model">claude-sonnet-4-5</td>
+              <td class="td-price">$3.00</td>
+              <td class="td-price">$15.00</td>
+              <td class="td-context">200K tokens</td>
+            </tr>
+            <tr>
+              <td class="td-model">claude-haiku-4-5</td>
+              <td class="td-price td-cheap">$1.00</td>
+              <td class="td-price td-cheap">$5.00</td>
+              <td class="td-context">200K tokens</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Legacy Models (Still Available)</h3>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Input ($/MTok)</th>
+              <th>Output ($/MTok)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-model">claude-haiku-3-5</td>
+              <td class="td-price">$0.80</td>
+              <td class="td-price">$4.00</td>
+            </tr>
+            <tr>
+              <td class="td-model">claude-haiku-3</td>
+              <td class="td-price td-cheap">$0.25</td>
+              <td class="td-price td-cheap">$1.25</td>
+            </tr>
+            <tr>
+              <td class="td-model">claude-opus-4</td>
+              <td class="td-price" style="color:var(--text2)">$15.00</td>
+              <td class="td-price" style="color:var(--text2)">$75.00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">Notable pricing changes</div>
+        <p><strong>Opus 4 vs. Opus 4.6 is not a typo.</strong> The newer "4.6" generation models are dramatically cheaper than the original Opus 4. Anthropic significantly restructured pricing with the 4.5/4.6 generation — Opus 4.6 at $5/MTok input vs. Opus 4 at $15/MTok input for the same capability tier. Sonnet 4.6 and Opus 4.6 also include a full 1M token context window at standard price.</p>
+      </div>
+
+      <p>The long-context surcharge ($6/MTok input, $22.50/MTok output) only kicks in above 200K input tokens per request. Most applications don't hit this.</p>
+
+      <hr>
+
+      <h2>The Two Biggest Levers: Batch API and Prompt Caching</h2>
+
+      <p>Before you worry about model selection, understand these two discounting mechanisms. They can cut your bill by 50–90%.</p>
+
+      <h3>Batch API (50% off)</h3>
+
+      <p>The Batch API processes requests asynchronously. You submit a batch, results come back within 24 hours. For any workload that isn't user-facing and real-time, this is the easiest way to halve your cost.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Batch Input ($/MTok)</th>
+              <th>Batch Output ($/MTok)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-model">claude-opus-4-6</td>
+              <td class="td-price td-cheap">$2.50</td>
+              <td class="td-price td-cheap">$12.50</td>
+            </tr>
+            <tr>
+              <td class="td-model">claude-sonnet-4-6</td>
+              <td class="td-price td-cheap">$1.50</td>
+              <td class="td-price td-cheap">$7.50</td>
+            </tr>
+            <tr>
+              <td class="td-model">claude-haiku-4-5</td>
+              <td class="td-price td-cheap">$0.50</td>
+              <td class="td-price td-cheap">$2.50</td>
+            </tr>
+            <tr>
+              <td class="td-model">claude-haiku-3 (batch)</td>
+              <td class="td-price td-cheap">$0.125</td>
+              <td class="td-price td-cheap">$0.625</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Prompt Caching (up to 90% off on re-read)</h3>
+
+      <p>If your requests share a large, repeated prefix — a system prompt, a reference document, a codebase — prompt caching lets the API reuse that processed context instead of re-tokenizing it every call.</p>
+
+      <p>Cache writes cost slightly more upfront (1.25x for a 5-minute cache, 2x for a 1-hour cache), but cache reads cost just <strong>10% of normal input price</strong>. Break-even happens after one re-read on 5-minute caches, two re-reads on 1-hour caches. In most real applications with repeated system prompts, caching pays for itself within a single session.</p>
+
+      <div class="callout">
+        <div class="callout-title">Stacking discounts</div>
+        <p>These two discounts stack. Batch processing + prompt caching can reduce effective input costs by 95% compared to naive API usage. This is not a rounding error — it's the difference between a $500/month bill and a $25/month bill for the same workload.</p>
+      </div>
+
+      <hr>
+
+      <h2>Real-World Cost Examples</h2>
+
+      <p>Abstract pricing is less useful than seeing what actual applications cost. Here are three representative scenarios.</p>
+
+      <h3>Scenario 1: Customer-Facing Chatbot at 1M Tokens/Day</h3>
+
+      <p><strong>Setup:</strong> A support chatbot. Each conversation averages 2,000 input tokens (system prompt + conversation history) and 500 output tokens. You handle roughly 400 conversations per day. That's 800K input tokens and 200K output tokens per day — approximately 1M total.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Approach</th>
+              <th>Daily cost</th>
+              <th>Monthly cost</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Sonnet 4.6, no caching</td>
+              <td class="td-price">~$5.40</td>
+              <td class="td-price">~$162</td>
+            </tr>
+            <tr>
+              <td>Sonnet 4.6 + prompt caching</td>
+              <td class="td-price td-cheap">~$3.78</td>
+              <td class="td-price td-cheap">~$113</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>With prompt caching (assuming 1,500 of 2,000 input tokens are a shared system prompt): cache reads run at $0.30/MTok vs. $3.00/MTok — roughly 30% reduction on a real-time conversational workload.</p>
+
+      <h3>Scenario 2: AI Coding Assistant</h3>
+
+      <p><strong>Setup:</strong> A coding assistant embedded in an IDE. Each interaction sends ~4,000 tokens of context (open files, instructions, conversation) and generates ~800 tokens of code. 50 interactions per day, 20 developers on the team = 1,000 requests/day: 4M input tokens, 800K output tokens.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Daily cost</th>
+              <th>Monthly cost</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Claude Sonnet 4.6</td>
+              <td class="td-price">$24.00</td>
+              <td class="td-price">$720</td>
+            </tr>
+            <tr>
+              <td>Claude Haiku 4.5</td>
+              <td class="td-price td-cheap">$8.00</td>
+              <td class="td-price td-cheap">$240</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Model selection alone is a 3x cost difference here. Profile what your task actually needs before defaulting to Sonnet — for autocomplete-style tasks, Haiku is usually sufficient.</p>
+
+      <h3>Scenario 3: Batch Document Processing</h3>
+
+      <p><strong>Setup:</strong> Nightly job that classifies and summarizes 10,000 documents. Average document is 800 input tokens; output is 150 tokens of structured summary. Not time-sensitive — results needed by morning.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Approach</th>
+              <th>Per nightly run</th>
+              <th>Monthly</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Sonnet 4.6, real-time</td>
+              <td class="td-price" style="color:var(--text2)">~$136</td>
+              <td class="td-price" style="color:var(--text2)">~$4,080</td>
+            </tr>
+            <tr>
+              <td>Haiku 4.5, Batch API</td>
+              <td class="td-price td-cheap">~$7.75</td>
+              <td class="td-price td-cheap">~$232</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The Batch API + Haiku combination runs this job at roughly 5% of what naive real-time Sonnet would cost. That's not a rounding error — it's a real architectural choice worth making at design time.</p>
+
+      <hr>
+
+      <h2>How to Actually Reduce Your Claude API Spend</h2>
+
+      <ul>
+        <li><strong>Start with Haiku, escalate if needed.</strong> Most routing and classification tasks, short-context completions, and structured extraction don't require Sonnet-level capability. Build with Haiku first. Upgrade specific flows that actually need it after you've benchmarked quality.</li>
+        <li><strong>Cache your system prompt.</strong> If you have a system prompt longer than ~500 tokens that's consistent across requests, add a <code>cache_control</code> block. It takes 10 minutes to implement and reduces those tokens to 10% cost on every subsequent call.</li>
+        <li><strong>Route to Batch for anything async.</strong> Data pipelines, report generation, overnight jobs, test suite evaluation — none of these need real-time responses. The Batch API's 50% discount is automatic. There's no good reason to pay full price for non-interactive workloads.</li>
+        <li><strong>Trim your context aggressively.</strong> Every token in your input costs money. Audit your prompts: remove redundant instructions, truncate conversation history appropriately, and avoid including full documents when relevant snippets will do.</li>
+        <li><strong>Monitor per-request token counts during development.</strong> The API response includes <code>usage.input_tokens</code> and <code>usage.output_tokens</code>. Log these in dev. It's common to discover that a "simple" feature is sending 5K tokens per call because of an accidentally included debug payload or unexpectedly long tool schema.</li>
+      </ul>
+
+      <hr>
+
+      <h2>Tracking Costs in Production</h2>
+
+      <p>The Anthropic Console gives you top-level usage dashboards, but it doesn't give you per-feature, per-user, or per-model breakdown out of the box. For teams that need cost attribution across multiple features or are watching spend against a budget, that gap gets painful quickly.</p>
+
+      <p>At the application layer, you should be logging token counts per request alongside request metadata (user ID, feature name, model used). From there you can build spend tracking in your data warehouse or use a purpose-built tool like <a href="https://getclawcost.com">ClawCost</a>, which handles the aggregation and alerting without requiring you to instrument everything from scratch.</p>
+
+      <p>The point is: don't wait until your monthly bill arrives to understand your cost breakdown. Token usage patterns during development often look nothing like production traffic.</p>
+
+      <hr>
+
+      <h2>Special Cases to Know About</h2>
+
+      <ul>
+        <li><strong>Tool use adds tokens.</strong> When you include tools in a request, Claude automatically adds a system prompt to enable them — roughly 313–346 extra input tokens depending on the tool choice mode. Tool definitions themselves also count as input tokens. In heavily agentic applications with large tool schemas, this overhead can be substantial.</li>
+        <li><strong>Web search costs extra.</strong> The built-in web search tool costs $10 per 1,000 searches on top of token costs. If you're building agents that search frequently, budget for this separately.</li>
+        <li><strong>Third-party platforms have their own pricing.</strong> Claude via AWS Bedrock or Google Vertex AI has different pricing, including regional vs. global endpoint premiums (regional is 10% more). Check those platforms' pricing pages directly rather than assuming parity with the direct API.</li>
+        <li><strong>Enterprise pricing is negotiable.</strong> At high volume, Anthropic's published rates aren't necessarily the floor. Custom pricing is available through their sales team.</li>
+      </ul>
+
+      <hr>
+
+      <h2>Quick Reference: Which Model Should I Use?</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Use Case</th>
+              <th>Recommended Model</th>
+              <th>Rough Cost Range</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>High-stakes reasoning, complex agents</td>
+              <td class="td-model">claude-opus-4-6</td>
+              <td class="td-price">$5–$25/MTok</td>
+            </tr>
+            <tr>
+              <td>General-purpose dev/prod workloads</td>
+              <td class="td-model">claude-sonnet-4-6</td>
+              <td class="td-price">$3–$15/MTok</td>
+            </tr>
+            <tr>
+              <td>High-volume classification, extraction</td>
+              <td class="td-model">claude-haiku-4-5</td>
+              <td class="td-price td-cheap">$1–$5/MTok</td>
+            </tr>
+            <tr>
+              <td>Ultra-high-volume batch, cost-sensitive</td>
+              <td class="td-model">claude-haiku-3 (batch)</td>
+              <td class="td-price td-cheap">$0.125–$0.625/MTok</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <hr>
+
+      <h2>The Bottom Line</h2>
+
+      <p>Claude API pricing in 2025 is genuinely competitive at every tier, but the variance between "naive usage" and "optimized usage" is enormous. A team spending $500/month could often run the same workload for $50–$100 with the right model selection, prompt caching, and Batch API routing.</p>
+
+      <p>The decisions that matter most:</p>
+      <ol>
+        <li><strong>Model selection</strong> — Haiku vs. Sonnet vs. Opus is often a 3–20x cost difference.</li>
+        <li><strong>Batch vs. real-time</strong> — a 50% cut on non-interactive work.</li>
+        <li><strong>Prompt caching</strong> — 90% reduction on repeated context.</li>
+      </ol>
+
+      <p>Get those three right and you've done the heavy lifting. After that, logging token counts per feature and watching spend over time keeps surprises off your bill.</p>
+
+      <p style="font-size:13px; color:var(--text3); margin-top:32px;">
+        Pricing sourced from the <a href="https://platform.claude.com/docs/en/about-claude/pricing" style="color:var(--text3)">Anthropic API documentation</a>. Prices are subject to change — verify current rates before making financial projections.
+      </p>
+
+      <div class="article-cta">
+        <h3>Stop guessing where your API spend is going</h3>
+        <p>ClawCost tracks every token — broken down by model, session, and project — in real time. Self-hosted, open source, free to start.</p>
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="btn-cta" target="_blank">Get started free →</a>
+        <a href="https://getclawcost.com/#pricing" class="btn-outline">See pricing</a>
+      </div>
+
+    </article>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a href="/" class="footer-logo">
+        <div class="nav-logo-mark" style="width:22px;height:22px">
+          <svg width="11" height="11" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        ClawCost
+      </a>
+      <div class="footer-links">
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="footer-link" target="_blank">GitHub</a>
+        <a href="/blog/" class="footer-link">Blog</a>
+        <a href="/#pricing" class="footer-link">Pricing</a>
+      </div>
+      <div class="footer-right">Built by Modology Studios</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
