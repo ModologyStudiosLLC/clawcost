@@ -20,7 +20,7 @@
 <meta name="twitter:image" content="https://getclawcost.com/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ─── Reset ─────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,21 +28,19 @@ html { scroll-behavior: smooth; }
 
 /* ─── Tokens ─────────────────────────────────────────────────────────────── */
 :root {
-  --bg:        #070709;
-  --surface:   #0f0f12;
-  --surface2:  #141418;
+  --bg:        #07080c;
+  --surface:   #0d0f18;
+  --surface2:  #131822;
   --border:    rgba(255,255,255,0.07);
   --border2:   rgba(255,255,255,0.12);
-  --text:      #f0f0f4;
-  --text2:     #8b8fa8;
-  --text3:     #4a4d62;
-  --violet:    #7c3aed;
-  --violet2:   #9d6bf2;
-  --green:     #22c55e;
-  --red:       #ef4444;
-  --amber:     #f59e0b;
-  --glow:      rgba(124, 58, 237, 0.18);
-  --glow2:     rgba(124, 58, 237, 0.08);
+  --text:      #eaedf5;
+  --text2:     #8891a8;
+  --text3:     #484d68;
+  --brand:     #e8961e;
+  --brand2:    #ffc04d;
+  --green:     #00d47e;
+  --red:       #ff4545;
+  --blue:      #3b82f6;
   --radius:    14px;
   --radius-sm: 8px;
 }
@@ -56,13 +54,10 @@ body {
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
+h1, h2, h3 { font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif; }
 
 /* ─── Scroll animations ──────────────────────────────────────────────────── */
-.reveal {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
-}
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1); }
 .reveal.visible { opacity: 1; transform: none; }
 .reveal-delay-1 { transition-delay: 0.1s; }
 .reveal-delay-2 { transition-delay: 0.2s; }
@@ -72,36 +67,14 @@ body {
 /* ─── Layout ─────────────────────────────────────────────────────────────── */
 .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
 
-/* ─── Background orbs ────────────────────────────────────────────────────── */
-.orb-wrap {
-  position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+/* ─── Background dot grid ────────────────────────────────────────────────── */
+.bg-grid {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%);
 }
-.orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.55;
-}
-.orb-1 {
-  width: 700px; height: 700px;
-  top: -200px; left: -200px;
-  background: radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 70%);
-  animation: drift1 18s ease-in-out infinite alternate;
-}
-.orb-2 {
-  width: 500px; height: 500px;
-  top: 40%; right: -150px;
-  background: radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 70%);
-  animation: drift2 22s ease-in-out infinite alternate;
-}
-.orb-3 {
-  width: 400px; height: 400px;
-  bottom: 10%; left: 30%;
-  background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
-  animation: drift1 26s ease-in-out infinite alternate-reverse;
-}
-@keyframes drift1 { from { transform: translate(0,0) scale(1); } to { transform: translate(60px,40px) scale(1.1); } }
-@keyframes drift2 { from { transform: translate(0,0); } to { transform: translate(-40px,60px); } }
 
 /* ─── Nav ────────────────────────────────────────────────────────────────── */
 nav {
@@ -109,28 +82,21 @@ nav {
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-bottom: 1px solid var(--border);
-  background: rgba(7,7,9,0.8);
+  background: rgba(7,8,12,0.85);
 }
-.nav-inner {
-  display: flex; align-items: center; gap: 32px;
-  height: 60px;
-}
+.nav-inner { display: flex; align-items: center; gap: 32px; height: 60px; }
 .nav-logo {
   display: flex; align-items: center; gap: 10px;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 15px; font-weight: 700; color: var(--text); text-decoration: none;
   letter-spacing: -0.02em;
 }
 .nav-logo-mark {
   width: 28px; height: 28px; border-radius: 7px;
-  background: none;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px;
-  box-shadow: 0 0 14px rgba(124,58,237,0.5);
+  background: linear-gradient(135deg, #e8961e, #c97a10);  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 14px rgba(232,150,30,0.4); flex-shrink: 0;
 }
-.nav-links {
-  display: flex; align-items: center; gap: 6px;
-  margin-left: auto;
-}
+.nav-links { display: flex; align-items: center; gap: 6px; margin-left: auto; }
 .nav-link {
   font-size: 14px; font-weight: 500; color: var(--text2);
   text-decoration: none; padding: 6px 12px; border-radius: 6px;
@@ -139,561 +105,262 @@ nav {
 .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
 .nav-cta {
   display: inline-flex; align-items: center; gap: 6px;
-  font-size: 14px; font-weight: 600; color: #fff;
-  background: var(--violet); border-radius: 8px;
+  font-size: 14px; font-weight: 600; color: #0a0a0e;
+  background: var(--brand); border-radius: 8px;
   padding: 7px 16px; text-decoration: none;
-  transition: opacity 0.2s, box-shadow 0.2s;
-  box-shadow: 0 0 20px rgba(124,58,237,0.35);
+  box-shadow: 0 0 20px rgba(232,150,30,0.3);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
 }
-.nav-cta:hover { opacity: 0.88; box-shadow: 0 0 32px rgba(124,58,237,0.55); }
+.nav-cta:hover { background: var(--brand2); box-shadow: 0 0 32px rgba(232,150,30,0.5); transform: translateY(-1px); }
 
 /* ─── Hero ───────────────────────────────────────────────────────────────── */
-.hero {
-  position: relative; z-index: 1;
-  padding: 148px 0 80px;
-  text-align: center;
+.hero { position: relative; z-index: 1; padding: 120px 0 80px; }
+.hero-glow {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 900px; height: 500px; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 0%, rgba(232,150,30,0.06) 0%, transparent 60%);
+}
+.hero-inner {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 72px; align-items: center;
 }
 .eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.10);
-  border-radius: 999px;
-  padding: 5px 14px 5px 8px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 999px; padding: 5px 14px 5px 8px;
   font-size: 13px; font-weight: 500; color: var(--text2);
-  margin-bottom: 28px;
-  cursor: default;
-  transition: border-color 0.2s;
+  margin-bottom: 28px; cursor: default; transition: border-color 0.2s;
 }
-.eyebrow:hover { border-color: rgba(124,58,237,0.4); }
-.eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.eyebrow:hover { border-color: rgba(232,150,30,0.4); }
+.eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; animation: blink 2.5s ease-in-out infinite; }
 .hero h1 {
-  font-size: clamp(44px, 5.5vw, 88px);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1.06;
-  margin-bottom: 24px;
-  max-width: 820px;
-  margin-left: auto; margin-right: auto;
+  font-size: clamp(40px, 4.5vw, 68px);
+  font-weight: 700; letter-spacing: -0.04em; line-height: 1.07; margin-bottom: 24px;
 }
 .grad-text {
-  background: linear-gradient(135deg, #ffffff 30%, rgba(180,160,255,0.85) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: linear-gradient(135deg, #ffffff 20%, #ffc04d 65%, #e8961e 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 .hero-sub {
-  font-size: clamp(16px, 1.8vw, 19px);
-  color: var(--text2);
-  max-width: 520px;
-  margin: 0 auto 40px;
-  line-height: 1.65;
+  font-size: clamp(15px, 1.5vw, 17px); color: var(--text2);
+  max-width: 460px; margin-bottom: 40px; line-height: 1.7;
 }
-.hero-actions {
-  display: flex; align-items: center; justify-content: center; gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 64px;
-}
+.hero-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .btn-primary {
   display: inline-flex; align-items: center; gap: 8px;
-  background: var(--violet); color: #fff;
-  font-size: 15px; font-weight: 600;
-  padding: 12px 24px; border-radius: 10px;
-  text-decoration: none;
-  box-shadow: 0 0 30px rgba(124,58,237,0.45);
-  transition: opacity 0.2s, box-shadow 0.2s, transform 0.2s;
-  animation: btn-pulse 3s ease-in-out infinite;
+  background: var(--brand); color: #0a0a0e;
+  font-size: 15px; font-weight: 600; padding: 12px 24px; border-radius: 10px;
+  text-decoration: none; box-shadow: 0 0 28px rgba(232,150,30,0.35);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
 }
-.btn-primary:hover {
-  opacity: 0.88; transform: translateY(-1px);
-  box-shadow: 0 0 48px rgba(124,58,237,0.65);
-}
-@keyframes btn-pulse {
-  0%,100% { box-shadow: 0 0 28px rgba(124,58,237,0.4); }
-  50%      { box-shadow: 0 0 44px rgba(124,58,237,0.65); }
-}
+.btn-primary:hover { background: var(--brand2); transform: translateY(-1px); box-shadow: 0 0 44px rgba(232,150,30,0.55); }
 .btn-secondary {
   display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--border2);
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border2);
   color: var(--text); font-size: 15px; font-weight: 500;
-  padding: 12px 22px; border-radius: 10px;
-  text-decoration: none;
-  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  padding: 12px 22px; border-radius: 10px; text-decoration: none;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
 }
-.btn-secondary:hover {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.2);
-  transform: translateY(-1px);
-}
+.btn-secondary:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-1px); }
 
 /* ─── Hero UI mockup ─────────────────────────────────────────────────────── */
-.hero-ui-wrap {
-  position: relative;
-  max-width: 860px;
-  margin: 0 auto;
-}
+.hero-ui-wrap { position: relative; }
 .hero-ui-glow {
-  position: absolute;
-  bottom: -60px; left: 50%;
-  transform: translateX(-50%);
-  width: 70%; height: 160px;
-  background: radial-gradient(ellipse at center, rgba(124,58,237,0.35) 0%, transparent 70%);
-  filter: blur(40px);
-  pointer-events: none;
+  position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);
+  width: 70%; height: 120px;
+  background: radial-gradient(ellipse at center, rgba(232,150,30,0.22) 0%, transparent 70%);
+  filter: blur(40px); pointer-events: none;
 }
 .hero-ui {
-  background: var(--surface);
-  border: 1px solid var(--border2);
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+  background: var(--surface); border: 1px solid var(--border2); border-radius: 18px;
+  overflow: hidden; box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
   transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
 }
-.hero-ui:hover { transform: translateY(-6px) scale(1.005); }
+.hero-ui:hover { transform: translateY(-4px) scale(1.005); }
 .ui-titlebar {
-  display: flex; align-items: center; gap: 8px;
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(255,255,255,0.02);
+  display: flex; align-items: center; gap: 8px; padding: 12px 18px;
+  border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02);
 }
 .ui-dot { width: 11px; height: 11px; border-radius: 50%; }
-.ui-dot-r { background: #ff5f57; }
-.ui-dot-y { background: #febc2e; }
-.ui-dot-g { background: #28c840; }
+.ui-dot-r { background: #ff5f57; } .ui-dot-y { background: #febc2e; } .ui-dot-g { background: #28c840; }
 .ui-titlebar-text {
-  margin-left: 6px;
-  font-size: 13px; font-weight: 500; color: var(--text3);
-  letter-spacing: 0.01em;
+  margin-left: 6px; font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 500; color: var(--text3);
 }
 .ui-titlebar-badge {
-  margin-left: auto;
-  display: flex; align-items: center; gap: 5px;
-  font-size: 11px; font-weight: 600; color: var(--green);
-  background: rgba(34,197,94,0.1);
-  border: 1px solid rgba(34,197,94,0.2);
+  margin-left: auto; display: flex; align-items: center; gap: 5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 600; color: var(--green);
+  background: rgba(0,212,126,0.08); border: 1px solid rgba(0,212,126,0.2);
   padding: 3px 10px; border-radius: 99px;
 }
-.ui-titlebar-badge::before {
-  content: '';
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--green);
-  animation: blink 2s ease-in-out infinite;
-}
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
-.ui-body { padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.ui-card {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 16px;
-}
-.ui-card-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 8px; }
-.ui-card-val { font-size: 28px; font-weight: 700; letter-spacing: -0.03em; color: var(--text); line-height: 1; }
-.ui-card-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
-.ui-bar { height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; margin-top: 12px; overflow: hidden; }
-.ui-bar-fill { height: 100%; border-radius: 3px; background: var(--violet); box-shadow: 0 0 8px rgba(124,58,237,0.6); }
-.ui-log-card {
-  grid-column: 1 / -1;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-}
-.ui-log-header { padding: 10px 14px; border-bottom: 1px solid var(--border); }
-.ui-log-header span { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); }
-.ui-log-row {
-  display: flex; align-items: center; gap: 10px;
-  padding: 9px 14px;
-  border-bottom: 1px solid rgba(255,255,255,0.03);
-  font-size: 12px; font-family: 'Menlo', 'Monaco', monospace;
-}
+.ui-titlebar-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: blink 2s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.35} }
+.ui-body { padding: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ui-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+.ui-card-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; }
+.ui-card-val { font-size: 26px; font-weight: 700; letter-spacing: -0.03em; color: var(--text); line-height: 1; }
+.ui-card-sub { font-size: 11px; color: var(--text2); margin-top: 4px; }
+.ui-bar { height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+.ui-bar-fill { height: 100%; border-radius: 2px; background: var(--brand); box-shadow: 0 0 8px rgba(232,150,30,0.5); }
+.ui-log-card { grid-column: 1 / -1; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.ui-log-header { padding: 8px 14px; border-bottom: 1px solid var(--border); }
+.ui-log-header span { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); }
+.ui-log-row { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 11px; font-family: 'JetBrains Mono', monospace; }
 .ui-log-row:last-child { border-bottom: none; }
-.log-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.log-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 .log-model { color: var(--text2); flex: 1; }
 .log-tokens { color: var(--text3); }
 .log-cost { color: var(--green); font-weight: 600; margin-left: auto; }
-.ui-footer {
-  padding: 12px 20px;
-  border-top: 1px solid var(--border);
-  display: flex; align-items: center; gap: 8px;
-  background: rgba(34,197,94,0.04);
-}
-.ui-footer-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 12px; font-weight: 600; color: var(--green);
-}
-.ui-footer-badge svg { flex-shrink: 0; }
-.ui-footer-remaining { font-size: 12px; color: var(--text2); margin-left: auto; }
+.ui-footer { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 8px; background: rgba(0,212,126,0.03); }
+.ui-footer-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--green); font-family: 'JetBrains Mono', monospace; }
+.ui-footer-remaining { font-size: 11px; color: var(--text2); margin-left: auto; font-family: 'JetBrains Mono', monospace; }
 
-/* ─── Stats strip ────────────────────────────────────────────────────────── */
-.stats-strip {
-  position: relative; z-index: 1;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  padding: 20px 0;
-  background: rgba(255,255,255,0.015);
-}
-.stats-inner {
-  display: flex; align-items: center; justify-content: center;
-  gap: 0; flex-wrap: wrap;
-}
-.stat-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 4px 40px;
-  border-right: 1px solid var(--border);
-}
-.stat-item:last-child { border-right: none; }
-.stat-icon { font-size: 18px; }
-.stat-text strong { font-size: 14px; font-weight: 600; color: var(--text); display: block; }
-.stat-text span { font-size: 12px; color: var(--text2); }
+/* ─── Stats ticker ───────────────────────────────────────────────────────── */
+.stats-strip { position: relative; z-index: 1; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); overflow: hidden; background: rgba(255,255,255,0.012); }
+.ticker-wrap { display: flex; height: 52px; align-items: center; overflow: hidden; }
+.ticker-track { display: flex; align-items: center; animation: ticker 32s linear infinite; white-space: nowrap; width: max-content; }
+.ticker-track:hover { animation-play-state: paused; }
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.stat-item { display: flex; align-items: center; gap: 10px; padding: 0 36px; border-right: 1px solid var(--border); height: 52px; }
+.stat-icon-wrap { width: 26px; height: 26px; border-radius: 6px; background: rgba(232,150,30,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.stat-text strong { font-size: 13px; font-weight: 600; color: var(--text); display: block; line-height: 1.3; }
+.stat-text span { font-size: 11px; color: var(--text2); }
 
 /* ─── Section scaffolding ────────────────────────────────────────────────── */
 section { position: relative; z-index: 1; }
 .section-label {
   display: inline-flex; align-items: center; gap: 6px;
-  font-size: 12px; font-weight: 600; text-transform: uppercase;
-  letter-spacing: 0.1em; color: var(--violet2);
-  margin-bottom: 16px;
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--brand); margin-bottom: 16px; font-family: 'JetBrains Mono', monospace;
 }
-.section-label::before {
-  content: '';
-  display: block;
-  width: 16px; height: 1px;
-  background: var(--violet2);
-}
-.section-title {
-  font-size: clamp(30px, 3.5vw, 48px);
-  font-weight: 800; letter-spacing: -0.03em;
-  line-height: 1.1; color: var(--text);
-  margin-bottom: 16px;
-}
-.section-sub {
-  font-size: 17px; color: var(--text2); line-height: 1.65;
-  max-width: 520px;
-}
+.section-label::before { content: ''; display: block; width: 16px; height: 1px; background: var(--brand); opacity: 0.6; }
+.section-title { font-size: clamp(28px, 3.2vw, 44px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; color: var(--text); margin-bottom: 16px; }
+.section-sub { font-size: 16px; color: var(--text2); line-height: 1.7; max-width: 520px; }
 
-/* ─── Problem section ────────────────────────────────────────────────────── */
+/* ─── Problem ────────────────────────────────────────────────────────────── */
 .problem { padding: 100px 0; }
-.problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
-.problem-quote {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 32px;
-  position: relative;
-}
-.problem-quote::before {
-  content: '"';
-  position: absolute; top: 20px; left: 28px;
-  font-size: 80px; line-height: 1; font-weight: 800;
-  color: var(--violet); opacity: 0.25;
-  font-family: Georgia, serif;
-}
-.quote-text {
-  font-size: 17px; line-height: 1.7; color: var(--text);
-  padding-top: 32px; position: relative; z-index: 1;
-}
-.quote-highlight {
-  color: var(--red); font-weight: 700;
-}
+.problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+.problem-quote { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; position: relative; }
+.problem-quote::before { content: '"'; position: absolute; top: 16px; left: 24px; font-size: 72px; line-height: 1; font-weight: 800; color: var(--brand); opacity: 0.15; font-family: Georgia, serif; }
+.quote-text { font-size: 16px; line-height: 1.75; color: var(--text); padding-top: 28px; position: relative; z-index: 1; }
+.quote-highlight { color: var(--red); font-weight: 700; }
 .quote-author { margin-top: 20px; display: flex; align-items: center; gap: 10px; }
-.quote-avatar {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--violet), #3b82f6);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 700; color: #fff;
-  flex-shrink: 0;
-}
+.quote-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #e8961e, #c97a10); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; font-family: 'Space Grotesk', sans-serif; }
 .quote-name { font-size: 13px; font-weight: 600; color: var(--text); }
 .quote-source { font-size: 12px; color: var(--text2); }
-.bill-breakdown {
-  display: flex; flex-direction: column; gap: 10px;
-  margin-top: 32px;
-}
-.bill-item {
-  display: flex; align-items: center; justify-content: space-between;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 12px 16px;
-}
-.bill-item.danger { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.04); }
+.bill-breakdown { display: flex; flex-direction: column; gap: 8px; margin-top: 32px; }
+.bill-item { display: flex; align-items: center; justify-content: space-between; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 11px 16px; }
+.bill-item.danger { border-color: rgba(255,69,69,0.3); background: rgba(255,69,69,0.04); }
 .bill-label { font-size: 13px; color: var(--text2); display: flex; align-items: center; gap: 8px; }
-.bill-label code { font-family: monospace; font-size: 12px; color: var(--text3); background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; }
-.bill-val { font-size: 14px; font-weight: 700; }
-.bill-val.red { color: var(--red); }
-.bill-val.green { color: var(--green); }
+.bill-label code { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3); background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; }
+.bill-val { font-size: 14px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.bill-val.red { color: var(--red); } .bill-val.green { color: var(--green); }
 
 /* ─── Features ───────────────────────────────────────────────────────────── */
 .features { padding: 100px 0; }
-.bento {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: auto;
-  gap: 14px;
-  margin-top: 64px;
-}
-.bento-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 28px;
-  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
-  cursor: default;
-}
-.bento-card:hover {
-  border-color: rgba(124,58,237,0.3);
-  box-shadow: 0 0 30px rgba(124,58,237,0.08);
-  transform: translateY(-2px);
-}
+.bento { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 56px; }
+.bento-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s; cursor: default; }
+.bento-card:hover { border-color: rgba(232,150,30,0.25); box-shadow: 0 0 30px rgba(232,150,30,0.05); transform: translateY(-2px); }
 .bento-card.wide { grid-column: span 2; }
-.bento-card.tall { grid-row: span 2; }
-.bento-icon {
-  width: 40px; height: 40px; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; margin-bottom: 16px;
-}
-.bento-icon.violet { background: rgba(124,58,237,0.15); }
-.bento-icon.green  { background: rgba(34,197,94,0.12); }
-.bento-icon.blue   { background: rgba(59,130,246,0.12); }
-.bento-icon.amber  { background: rgba(245,158,11,0.12); }
-.bento-title { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); margin-bottom: 8px; }
-.bento-desc { font-size: 14px; color: var(--text2); line-height: 1.6; }
-/* wide card terminal */
-.terminal {
-  margin-top: 20px;
-  background: #0a0a0c;
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 8px;
-  padding: 16px;
-  font-family: 'Menlo','Monaco','Courier New',monospace;
-  font-size: 12.5px;
-  line-height: 1.8;
-}
-.t-prompt { color: var(--violet2); }
-.t-cmd    { color: var(--text); }
-.t-out    { color: var(--text2); }
-.t-url    { color: var(--green); }
-.t-comment{ color: var(--text3); }
+.bento-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+.bento-icon.amber { background: rgba(232,150,30,0.12); }
+.bento-icon.green  { background: rgba(0,212,126,0.10); }
+.bento-icon.blue   { background: rgba(59,130,246,0.10); }
+.bento-icon.red    { background: rgba(255,69,69,0.10); }
+.bento-title { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; color: var(--text); margin-bottom: 8px; }
+.bento-desc { font-size: 13.5px; color: var(--text2); line-height: 1.65; }
+.terminal { margin-top: 18px; background: #08090e; border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 14px 16px; font-family: 'JetBrains Mono', 'Menlo', monospace; font-size: 12px; line-height: 1.9; }
+.t-prompt { color: var(--brand2); } .t-cmd { color: var(--text); } .t-out { color: var(--text2); } .t-url { color: var(--green); } .t-comment { color: var(--text3); }
 
 /* ─── How it works ───────────────────────────────────────────────────────── */
 .how { padding: 100px 0; }
-.steps {
-  display: grid; grid-template-columns: repeat(3,1fr); gap: 2px;
-  margin-top: 64px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-.step {
-  background: var(--surface);
-  padding: 36px 32px;
-  position: relative;
-  transition: background 0.2s;
-}
+.steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; margin-top: 56px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.step { background: var(--surface); padding: 36px 32px; transition: background 0.2s; }
 .step:hover { background: var(--surface2); }
-.step-num {
-  font-size: 11px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.12em; color: var(--violet2); margin-bottom: 20px;
-  display: flex; align-items: center; gap: 8px;
-}
-.step-num::after {
-  content: ''; flex: 1; height: 1px;
-  background: linear-gradient(to right, rgba(124,58,237,0.4), transparent);
-}
-.step-title { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px; }
+.step-num { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--brand2); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; }
+.step-num::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, rgba(232,150,30,0.35), transparent); }
+.step-title { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 10px; }
 .step-desc { font-size: 14px; color: var(--text2); line-height: 1.65; }
-.step-code {
-  margin-top: 16px;
-  background: #0a0a0c;
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 6px;
-  padding: 10px 14px;
-  font-family: monospace;
-  font-size: 12px;
-  color: var(--violet2);
-  word-break: break-all;
-}
+.step-code { margin-top: 16px; background: #08090e; border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 10px 14px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--brand2); word-break: break-all; }
 .step-code span { color: var(--text2); }
 
 /* ─── Pricing ────────────────────────────────────────────────────────────── */
 .pricing { padding: 100px 0; }
-.pricing-grid {
-  display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
-  margin-top: 64px;
-}
-.pricing-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 32px;
-  position: relative;
-  transition: transform 0.25s, box-shadow 0.25s;
-}
+.pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 56px; }
+.pricing-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; position: relative; transition: transform 0.25s, box-shadow 0.25s; }
 .pricing-card:hover { transform: translateY(-3px); }
-.pricing-card.featured {
-  border-color: rgba(124,58,237,0.5);
-  box-shadow: 0 0 50px rgba(124,58,237,0.12);
-  background: linear-gradient(180deg, rgba(124,58,237,0.06) 0%, var(--surface) 100%);
-}
-.pricing-badge {
-  position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
-  background: var(--violet); color: #fff;
-  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
-  padding: 4px 14px; border-radius: 99px;
-  white-space: nowrap;
-}
-.pricing-tier { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text2); margin-bottom: 12px; }
-.pricing-price {
-  display: flex; align-items: baseline; gap: 4px;
-  margin-bottom: 6px;
-}
-.pricing-amount { font-size: 42px; font-weight: 800; letter-spacing: -0.04em; }
+.pricing-card.featured { border-color: rgba(232,150,30,0.4); box-shadow: 0 0 50px rgba(232,150,30,0.08); background: linear-gradient(160deg, rgba(232,150,30,0.05) 0%, var(--surface) 60%); }
+.pricing-badge { position: absolute; top: -13px; left: 50%; transform: translateX(-50%); background: var(--brand); color: #0a0a0e; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 14px; border-radius: 99px; white-space: nowrap; font-family: 'JetBrains Mono', monospace; }
+.pricing-tier { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text2); margin-bottom: 12px; font-family: 'JetBrains Mono', monospace; }
+.pricing-price { display: flex; align-items: baseline; gap: 4px; margin-bottom: 6px; }
+.pricing-amount { font-size: 42px; font-weight: 700; letter-spacing: -0.04em; }
 .pricing-per { font-size: 14px; color: var(--text2); }
-.pricing-desc { font-size: 14px; color: var(--text2); margin-bottom: 24px; line-height: 1.5; }
+.pricing-desc { font-size: 14px; color: var(--text2); margin-bottom: 24px; line-height: 1.55; }
 .pricing-divider { height: 1px; background: var(--border); margin-bottom: 24px; }
 .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
-.pricing-features li {
-  display: flex; align-items: flex-start; gap: 10px;
-  font-size: 14px; color: var(--text2); line-height: 1.4;
-}
-.pricing-features li::before {
-  content: '✓'; color: var(--green);
-  font-weight: 700; font-size: 13px;
-  flex-shrink: 0; margin-top: 1px;
-}
-.pricing-features li.muted::before { content: '–'; color: var(--text3); }
+.pricing-features li { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; color: var(--text2); line-height: 1.4; }
+.pricing-features li::before { content: '✓'; color: var(--green); font-size: 12px; font-weight: 700; margin-top: 1px; flex-shrink: 0; }
 .pricing-features li.muted { color: var(--text3); }
-.pricing-btn {
-  display: block; text-align: center;
-  font-size: 14px; font-weight: 600; text-decoration: none;
-  padding: 11px; border-radius: 9px;
-  transition: opacity 0.2s, background 0.2s, transform 0.2s;
-}
+.pricing-features li.muted::before { content: '–'; color: var(--text3); }
+.pricing-btn { display: block; width: 100%; padding: 12px 20px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; text-align: center; text-decoration: none; transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.15s; }
 .pricing-btn:hover { transform: translateY(-1px); }
-.pricing-btn.outline {
-  border: 1px solid var(--border2); color: var(--text);
-}
-.pricing-btn.outline:hover { background: rgba(255,255,255,0.05); }
-.pricing-btn.solid {
-  background: var(--violet); color: #fff;
-  box-shadow: 0 0 24px rgba(124,58,237,0.35);
-}
-.pricing-btn.solid:hover { opacity: 0.88; }
+.pricing-btn.outline { background: transparent; color: var(--text); border: 1px solid var(--border2); }
+.pricing-btn.outline:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); }
+.pricing-btn.solid { background: var(--brand); color: #0a0a0e; border: 1px solid transparent; box-shadow: 0 0 24px rgba(232,150,30,0.3); }
+.pricing-btn.solid:hover { background: var(--brand2); box-shadow: 0 0 36px rgba(232,150,30,0.5); }
 
-/* ─── CTA section ────────────────────────────────────────────────────────── */
-.cta-section {
-  padding: 100px 0;
-  text-align: center;
-}
-.cta-box {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 80px 40px;
-  position: relative;
-  overflow: hidden;
-}
-.cta-box::before {
-  content: '';
-  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-  width: 400px; height: 200px;
-  background: radial-gradient(ellipse at top, rgba(124,58,237,0.2) 0%, transparent 70%);
-  pointer-events: none;
-}
-.cta-box h2 {
-  font-size: clamp(30px,4vw,52px);
-  font-weight: 800; letter-spacing: -0.04em;
-  margin-bottom: 16px;
-}
-.cta-box p { font-size: 17px; color: var(--text2); margin-bottom: 36px; max-width: 440px; margin-left: auto; margin-right: auto; }
-
-/* ─── Waitlist form ──────────────────────────────────────────────────────── */
-.waitlist-form {
-  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
-  max-width: 440px; margin: 0 auto 24px;
-}
-.waitlist-form input[type="email"] {
-  flex: 1; min-width: 220px;
-  background: var(--surface2); border: 1px solid var(--border2);
-  border-radius: var(--radius-sm); padding: 12px 16px;
-  color: var(--text); font-size: 15px; font-family: inherit;
-  outline: none; transition: border-color .2s;
-}
-.waitlist-form input[type="email"]:focus { border-color: var(--violet); }
-.waitlist-form input[type="email"]::placeholder { color: var(--text3); }
-.waitlist-form button {
-  background: var(--violet); color: #fff; border: none; cursor: pointer;
-  border-radius: var(--radius-sm); padding: 12px 20px;
-  font-size: 14px; font-weight: 600; font-family: inherit;
-  white-space: nowrap; transition: opacity .2s;
-}
-.waitlist-form button:hover { opacity: .88; }
-.waitlist-success { color: var(--green); font-size: 15px; display: none; margin-top: 8px; }
-.install-block {
-  display: inline-flex; align-items: center; gap: 12px;
-  background: #0a0a0c;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 10px;
-  padding: 14px 20px;
-  font-family: monospace; font-size: 14px;
-  color: var(--text2);
-  margin-bottom: 32px;
-  cursor: pointer;
-  transition: border-color 0.2s;
-  user-select: all;
-}
-.install-block:hover { border-color: rgba(124,58,237,0.4); }
-.install-block span { color: var(--text3); }
-.install-block code { color: var(--violet2); }
-
+/* ─── CTA ────────────────────────────────────────────────────────────────── */
+.cta-section { padding: 100px 0; }
+.cta-box { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 72px 64px; text-align: center; position: relative; overflow: hidden; }
+.cta-box::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 600px; height: 300px; background: radial-gradient(ellipse at 50% 0%, rgba(232,150,30,0.08) 0%, transparent 65%); pointer-events: none; }
+.cta-box h2 { font-size: clamp(28px, 3vw, 44px); font-weight: 700; letter-spacing: -0.03em; margin-bottom: 16px; }
+.cta-box > p { font-size: 16px; color: var(--text2); margin-bottom: 36px; }
+.install-block { display: inline-flex; align-items: center; gap: 12px; background: #08090e; border: 1px solid var(--border2); border-radius: 10px; padding: 12px 20px; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text); cursor: pointer; user-select: none; transition: border-color 0.2s, background 0.2s; margin-bottom: 32px; }
+.install-block:hover { border-color: rgba(232,150,30,0.4); background: rgba(232,150,30,0.03); }
+.install-block span { color: var(--brand); }
 /* ─── Footer ─────────────────────────────────────────────────────────────── */
-footer {
-  position: relative; z-index: 1;
-  border-top: 1px solid var(--border);
-  padding: 40px 0;
-}
-.footer-inner {
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 20px;
-}
-.footer-logo {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 14px; font-weight: 700; color: var(--text);
-  text-decoration: none; letter-spacing: -0.02em;
-}
+footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 32px 0; background: rgba(255,255,255,0.008); }
+.footer-inner { display: flex; align-items: center; gap: 24px; }
+.footer-logo { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--text2); text-decoration: none; font-family: 'Space Grotesk', sans-serif; transition: color 0.2s; }
+.footer-logo:hover { color: var(--text); }
 .footer-links { display: flex; gap: 24px; }
 .footer-link { font-size: 13px; color: var(--text2); text-decoration: none; transition: color 0.2s; }
 .footer-link:hover { color: var(--text); }
-.footer-right { font-size: 13px; color: var(--text3); }
+.footer-right { font-size: 13px; color: var(--text3); margin-left: auto; }
 
 /* ─── Responsive ─────────────────────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .problem-grid, .steps, .bento, .pricing-grid { grid-template-columns: 1fr; }
-  .bento-card.wide { grid-column: span 1; }
-  .stat-item { padding: 8px 20px; border-right: none; border-bottom: 1px solid var(--border); width: 100%; }
-  .stat-item:last-child { border-bottom: none; }
-  .stats-inner { flex-direction: column; }
+@media (max-width: 900px) {
+  .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+  .hero h1 { font-size: clamp(36px, 8vw, 52px); }
+  .hero-sub { max-width: 100%; }
+  .problem-grid { grid-template-columns: 1fr; gap: 40px; }
+  .bento { grid-template-columns: 1fr 1fr; }
+  .bento-card.wide { grid-column: span 2; }
+  .steps { grid-template-columns: 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin-left: auto; margin-right: auto; }
+  .cta-box { padding: 48px 32px; }
+  .footer-inner { flex-wrap: wrap; }
+  .footer-right { width: 100%; margin-left: 0; }
+}
+@media (max-width: 640px) {
+  .bento { grid-template-columns: 1fr; }
+  .bento-card.wide { grid-column: auto; }
   .nav-links a:not(.nav-cta) { display: none; }
 }
 </style>
 </head>
 <body>
 
-<!-- Background orbs -->
-<div class="orb-wrap" aria-hidden="true">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-</div>
+<div class="bg-grid" aria-hidden="true"></div>
 
 <!-- Nav -->
 <nav>
   <div class="container nav-inner">
     <a href="/" class="nav-logo">
-      <img src="/icon.svg" class="nav-logo-mark" alt="ClawCost icon" width="28" height="28">
-      ClawCost
+      <div class="nav-logo-mark">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>      ClawCost
     </a>
     <div class="nav-links">
       <a href="#features" class="nav-link">Features</a>
@@ -710,141 +377,160 @@ footer {
 
 <!-- Hero -->
 <section class="hero">
+  <div class="hero-glow" aria-hidden="true"></div>
   <div class="container">
-    <div class="reveal">
-      <div class="eyebrow">
-        <div class="eyebrow-dot"></div>
-        Open source · Free to self-host
+    <div class="hero-inner">
+      <div class="hero-text">
+        <div class="reveal">
+          <div class="eyebrow">
+            <div class="eyebrow-dot"></div>
+            Open source · Free to self-host
+          </div>
+        </div>
+        <div class="reveal reveal-delay-1">
+          <h1><span class="grad-text">Stop getting blindsided<br>by your AI bill.</span></h1>
+        </div>
+        <div class="reveal reveal-delay-2">
+          <p class="hero-sub">ClawCost is a transparent proxy for OpenClaw that tracks every token in real time, enforces hard spending budgets, and shows you exactly where your money goes.</p>
+        </div>
+        <div class="reveal reveal-delay-3">
+          <div class="hero-actions">
+            <a href="https://github.com/MJFlanigan5/clawcost" class="btn-primary" target="_blank">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+              Get started free
+            </a>
+            <a href="https://github.com/MJFlanigan5/clawcost" class="btn-secondary" target="_blank">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.29 9.42 7.86 10.95.57.1.78-.25.78-.56 0-.28-.01-1.02-.01-2-3.2.7-3.87-1.54-3.87-1.54-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.53-2.55-.29-5.23-1.28-5.23-5.68 0-1.25.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.17a10.9 10.9 0 012.87-.39c.97 0 1.95.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.58.23 2.75.11 3.04.73.8 1.18 1.83 1.18 3.08 0 4.41-2.69 5.38-5.25 5.67.41.35.77 1.05.77 2.11 0 1.53-.01 2.76-.01 3.13 0 .31.2.67.79.56A11.51 11.51 0 0023.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+              View on GitHub
+            </a>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="reveal reveal-delay-1">
-      <h1>
-        <span class="grad-text">Stop getting blindsided<br>by your AI bill.</span>
-      </h1>
-    </div>
-    <div class="reveal reveal-delay-2">
-      <p class="hero-sub">
-        ClawCost is a transparent proxy that sits between your app and any LLM API — OpenAI, Anthropic, Gemini, DeepSeek — tracks every token in real time, enforces hard spending budgets, and shows you exactly where your money goes.
-      </p>
-    </div>
-    <div class="reveal reveal-delay-3">
-      <div class="hero-actions">
-        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="btn-primary" target="_blank">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
-          Get started free
-        </a>
-        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="btn-secondary" target="_blank">
-          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.29 9.42 7.86 10.95.57.1.78-.25.78-.56 0-.28-.01-1.02-.01-2-3.2.7-3.87-1.54-3.87-1.54-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.53-2.55-.29-5.23-1.28-5.23-5.68 0-1.25.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.17a10.9 10.9 0 012.87-.39c.97 0 1.95.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.58.23 2.75.11 3.04.73.8 1.18 1.83 1.18 3.08 0 4.41-2.69 5.38-5.25 5.67.41.35.77 1.05.77 2.11 0 1.53-.01 2.76-.01 3.13 0 .31.2.67.79.56A11.51 11.51 0 0023.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
-          View on GitHub
-        </a>
-      </div>
-    </div>
 
-    <!-- UI Mockup -->
-    <div class="hero-ui-wrap reveal reveal-delay-4">
-      <div class="hero-ui-glow"></div>
-      <div class="hero-ui">
-        <div class="ui-titlebar">
-          <div class="ui-dot ui-dot-r"></div>
-          <div class="ui-dot ui-dot-y"></div>
-          <div class="ui-dot ui-dot-g"></div>
-          <span class="ui-titlebar-text">ClawCost Dashboard — localhost:4100</span>
-          <div class="ui-titlebar-badge">PROXY ACTIVE</div>
-        </div>
-        <div class="ui-body">
-          <div class="ui-card">
-            <div class="ui-card-label">Today's Spend</div>
-            <div class="ui-card-val">$1.23</div>
-            <div class="ui-card-sub">47 requests · 284k tokens</div>
-            <div class="ui-bar"><div class="ui-bar-fill" style="width:24%"></div></div>
+      <!-- UI Mockup -->
+      <div class="hero-ui-wrap reveal reveal-delay-4">
+        <div class="hero-ui-glow"></div>
+        <div class="hero-ui">
+          <div class="ui-titlebar">
+            <div class="ui-dot ui-dot-r"></div>
+            <div class="ui-dot ui-dot-y"></div>
+            <div class="ui-dot ui-dot-g"></div>
+            <span class="ui-titlebar-text">ClawCost Dashboard — localhost:4100</span>
+            <div class="ui-titlebar-badge">PROXY ACTIVE</div>
           </div>
-          <div class="ui-card">
-            <div class="ui-card-label">Monthly (30 days)</div>
-            <div class="ui-card-val">$12.40</div>
-            <div class="ui-card-sub">1,284 requests</div>
-            <div class="ui-bar"><div class="ui-bar-fill" style="width:24%; background: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,0.6)"></div></div>
-          </div>
-          <div class="ui-log-card">
-            <div class="ui-log-header"><span>Recent Requests</span></div>
-            <div class="ui-log-row">
-              <div class="log-dot" style="background:#7c3aed"></div>
-              <span class="log-model">claude-sonnet-4-6</span>
-              <span class="log-tokens">in:1,240 out:456</span>
-              <span class="log-cost">$0.0122</span>
+          <div class="ui-body">
+            <div class="ui-card">
+              <div class="ui-card-label">Today's Spend</div>
+              <div class="ui-card-val">$1.23</div>
+              <div class="ui-card-sub">47 requests · 284k tokens</div>
+              <div class="ui-bar"><div class="ui-bar-fill" style="width:24%"></div></div>
             </div>
-            <div class="ui-log-row">
-              <div class="log-dot" style="background:#7c3aed"></div>
-              <span class="log-model">claude-sonnet-4-6</span>
-              <span class="log-tokens">in:2,880 out:892</span>
-              <span class="log-cost">$0.0222</span>
+            <div class="ui-card">
+              <div class="ui-card-label">Monthly (30 days)</div>
+              <div class="ui-card-val">$12.40</div>
+              <div class="ui-card-sub">1,284 requests</div>
+              <div class="ui-bar"><div class="ui-bar-fill" style="width:41%; background:#3b82f6; box-shadow:0 0 8px rgba(59,130,246,0.5)"></div></div>
             </div>
-            <div class="ui-log-row">
-              <div class="log-dot" style="background:#9d6bf2"></div>
-              <span class="log-model">claude-opus-4-6</span>
-              <span class="log-tokens">in:987 out:234</span>
-              <span class="log-cost">$0.0324</span>
+            <div class="ui-log-card">
+              <div class="ui-log-header"><span>Recent Requests</span></div>
+              <div class="ui-log-row">
+                <div class="log-dot" style="background:#e8961e"></div>
+                <span class="log-model">claude-sonnet-4-6</span>
+                <span class="log-tokens">in:1,240 out:456</span>
+                <span class="log-cost">$0.0122</span>
+              </div>
+              <div class="ui-log-row">
+                <div class="log-dot" style="background:#e8961e"></div>
+                <span class="log-model">claude-sonnet-4-6</span>
+                <span class="log-tokens">in:2,880 out:892</span>
+                <span class="log-cost">$0.0222</span>
+              </div>
+              <div class="ui-log-row">
+                <div class="log-dot" style="background:#3b82f6"></div>
+                <span class="log-model">gpt-4o</span>
+                <span class="log-tokens">in:987 out:234</span>
+                <span class="log-cost">$0.0089</span>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="ui-footer">
-          <div class="ui-footer-badge">
-            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#22c55e" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-            Budget safe
+          <div class="ui-footer">
+            <div class="ui-footer-badge">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#00d47e" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              Budget safe
+            </div>
+            <span class="ui-footer-remaining">$3.77 remaining today</span>
           </div>
-          <span class="ui-footer-remaining">$3.77 remaining today</span>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Stats strip -->
+<!-- Stats ticker -->
 <div class="stats-strip">
-  <div class="container">
-    <div class="stats-inner">
+  <div class="ticker-wrap">
+    <div class="ticker-track">
       <div class="stat-item">
-        <span class="stat-icon">⚡</span>
-        <div class="stat-text">
-          <strong>One env var</strong>
-          <span>5-minute setup</span>
-        </div>
+        <div class="stat-icon-wrap"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="#e8961e" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+        <div class="stat-text"><strong>One env var</strong><span>5-minute setup</span></div>
       </div>
       <div class="stat-item">
-        <span class="stat-icon">🔒</span>
-        <div class="stat-text">
-          <strong>Local-first</strong>
-          <span>All data stays on your machine</span>
-        </div>
+        <div class="stat-icon-wrap"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="#e8961e" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+        <div class="stat-text"><strong>Local-first</strong><span>Data never leaves your machine</span></div>
       </div>
       <div class="stat-item">
-        <span class="stat-icon">🎯</span>
-        <div class="stat-text">
-          <strong>Hard budget limits</strong>
-          <span>Blocks the request, not just alerts</span>
-        </div>
+        <div class="stat-icon-wrap"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="#e8961e" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4"/></svg></div>
+        <div class="stat-text"><strong>Hard budget limits</strong><span>Blocks the request, not just alerts</span></div>
       </div>
       <div class="stat-item">
-        <span class="stat-icon">↔</span>
-        <div class="stat-text">
-          <strong>Zero latency overhead</strong>
-          <span>Streams through without buffering</span>
-        </div>
+        <div class="stat-icon-wrap"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="#e8961e" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
+        <div class="stat-text"><strong>Per-model tracking</strong><span>See exactly who's spending what</span></div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon-wrap"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="#e8961e" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg></div>
+        <div class="stat-text"><strong>Multi-provider</strong><span>Anthropic, OpenAI, Gemini, DeepSeek</span></div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon-wrap"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="#e8961e" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg></div>
+        <div class="stat-text"><strong>Zero latency overhead</strong><span>Streams without buffering</span></div>
+      </div>
+      <!-- Duplicate set for seamless loop -->
+      <div class="stat-item">
+        <div class="stat-icon-wrap"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="#e8961e" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+        <div class="stat-text"><strong>One env var</strong><span>5-minute setup</span></div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon-wrap"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="#e8961e" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+        <div class="stat-text"><strong>Local-first</strong><span>Data never leaves your machine</span></div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon-wrap"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="#e8961e" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4"/></svg></div>
+        <div class="stat-text"><strong>Hard budget limits</strong><span>Blocks the request, not just alerts</span></div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon-wrap"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="#e8961e" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
+        <div class="stat-text"><strong>Per-model tracking</strong><span>See exactly who's spending what</span></div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon-wrap"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="#e8961e" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg></div>
+        <div class="stat-text"><strong>Multi-provider</strong><span>Anthropic, OpenAI, Gemini, DeepSeek</span></div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon-wrap"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="#e8961e" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg></div>
+        <div class="stat-text"><strong>Zero latency overhead</strong><span>Streams without buffering</span></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Problem section -->
+<!-- Problem -->
 <section class="problem">
   <div class="container">
     <div class="problem-grid">
       <div>
         <div class="section-label reveal">The problem</div>
-        <h2 class="section-title reveal reveal-delay-1">Your AI bill doesn't care that you weren't watching.</h2>
-        <p class="section-sub reveal reveal-delay-2">
-          Every agent session, every background job, every retry — they all add up. With Claude Opus or Gemini 2.5 Pro, a few runaway sessions can cost hundreds of dollars before you even open your inbox. ClawCost blocks the spend before it happens.
-        </p>
-        <div class="bill-breakdown reveal reveal-delay-3">
+        <h2 class="section-title reveal reveal-delay-1">OpenClaw doesn't stop spending when you're not watching.</h2>
+        <p class="section-sub reveal reveal-delay-2">By default, OpenClaw loads full conversation history into context on every API call. With Claude Opus or Gemini 2.5 Pro, costs compound fast — and by the time you notice, the damage is done.</p>        <div class="bill-breakdown reveal reveal-delay-3">
           <div class="bill-item">
             <span class="bill-label"><code>claude-opus-4-6</code> · 10 agent sessions</span>
             <span class="bill-val red">$340</span>
@@ -855,18 +541,16 @@ footer {
           </div>
           <div class="bill-item danger">
             <span class="bill-label">Unexpected monthly bill</span>
-            <span class="bill-val red">$3,600 😱</span>
+            <span class="bill-val red">$3,600</span>
           </div>
-          <div class="bill-item" style="border-color:rgba(34,197,94,0.3); background:rgba(34,197,94,0.04)">
+          <div class="bill-item" style="border-color:rgba(0,212,126,0.3);background:rgba(0,212,126,0.04)">
             <span class="bill-label">With ClawCost daily budget</span>
             <span class="bill-val green">Blocked at $5.00 ✓</span>
           </div>
         </div>
       </div>
       <div class="problem-quote reveal reveal-delay-2">
-        <p class="quote-text">
-          "I woke up to a <span class="quote-highlight">$3,600 Anthropic invoice</span> for a single month. My OpenClaw instance ran overnight with full context loading and I had no idea. I would have paid anything for a tool that just stopped it."
-        </p>
+        <p class="quote-text">"I woke up to a <span class="quote-highlight">$3,600 Anthropic invoice</span> for a single month. My OpenClaw instance ran overnight with full context loading and I had no idea. I would have paid anything for a tool that just stopped it."</p>
         <div class="quote-author">
           <div class="quote-avatar">T</div>
           <div>
@@ -884,32 +568,24 @@ footer {
   <div class="container">
     <div class="section-label reveal">Features</div>
     <h2 class="section-title reveal reveal-delay-1">Everything you need,<br>nothing you don't.</h2>
-
     <div class="bento">
-      <!-- Card 1: Budget enforcement -->
       <div class="bento-card reveal">
-        <div class="bento-icon violet">🛑</div>
+        <div class="bento-icon red"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#ff4545" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="9" x2="12" y2="13" stroke="#ff4545" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="#ff4545"/></svg></div>
         <div class="bento-title">Hard budget enforcement</div>
         <div class="bento-desc">Set daily and monthly limits. When you hit the cap, ClawCost returns an HTTP 429 before the API call is even made — not after the bill lands.</div>
       </div>
-
-      <!-- Card 2: Per-agent tracking -->
       <div class="bento-card reveal reveal-delay-1">
-        <div class="bento-icon green">📊</div>
+        <div class="bento-icon green"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#00d47e" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
         <div class="bento-title">Per-agent, per-model tracking</div>
         <div class="bento-desc">See exactly which agent or session is spending what, broken down by model. Identify your most expensive calls in seconds.</div>
       </div>
-
-      <!-- Card 3: Zero latency -->
       <div class="bento-card reveal reveal-delay-2">
-        <div class="bento-icon blue">⚡</div>
+        <div class="bento-icon amber"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#e8961e" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
         <div class="bento-title">Zero latency streaming</div>
         <div class="bento-desc">ClawCost parses SSE events as they stream through — it never buffers the full response. Your agents see no speed difference.</div>
       </div>
-
-      <!-- Card 4: Wide — setup code -->
       <div class="bento-card wide reveal reveal-delay-1">
-        <div class="bento-icon amber">🔌</div>
+        <div class="bento-icon blue"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#3b82f6" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path stroke-linecap="round" stroke-linejoin="round" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div>
         <div class="bento-title">One line to activate</div>
         <div class="bento-desc">No OpenClaw plugins to install. No config changes. Just point OpenClaw's base URL at ClawCost and you're done.</div>
         <div class="terminal">
@@ -922,35 +598,26 @@ footer {
           <div><span class="t-cmd">ANTHROPIC_BASE_URL=http://localhost:4100/v1</span></div>
         </div>
       </div>
-
-      <!-- Card 5: Local data -->
       <div class="bento-card reveal reveal-delay-2">
-        <div class="bento-icon violet">🔒</div>
+        <div class="bento-icon amber"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#e8961e" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
         <div class="bento-title">100% local, private by default</div>
-        <div class="bento-desc">Usage data is stored in a local SQLite database at <code style="font-size:11px;background:rgba(255,255,255,0.07);padding:2px 5px;border-radius:4px">~/.clawcost/usage.db</code>. Nothing leaves your machine.</div>
+        <div class="bento-desc">Usage data is stored in a local SQLite database at <code style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.07);padding:2px 5px;border-radius:4px">~/.clawcost/usage.db</code>. Nothing leaves your machine.</div>
       </div>
-
-      <!-- Card 6: Alerts -->
       <div class="bento-card reveal reveal-delay-2">
-        <div class="bento-icon amber">🔔</div>
+        <div class="bento-icon green"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#00d47e" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path stroke-linecap="round" stroke-linejoin="round" d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
         <div class="bento-title">Slack + email alerts</div>
         <div class="bento-desc">Get notified at 80% and 100% of your budget — in Slack or by email. Paste a webhook URL and you're done. Built in, no extra service needed.</div>
       </div>
-
-      <!-- Card 7: Multi-provider — now full width -->
       <div class="bento-card wide reveal reveal-delay-3">
-        <div style="display:flex;align-items:flex-start;gap:32px">
-          <div>
-            <div class="bento-icon green">🌐</div>
-            <div class="bento-title">Anthropic + OpenAI</div>
-            <div class="bento-desc">Works with all major providers OpenClaw supports. Accurate pricing for Claude, GPT-4o, o3, and Gemini models built in. Unknown models fall back to Sonnet rates.</div>
-          </div>
-          <div style="flex:1;background:#0a0a0c;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:16px;font-family:monospace;font-size:12px;line-height:1.9">
-            <div><span style="color:#4a4d62"># Anthropic</span></div>
-            <div><span style="color:#7c3aed">ANTHROPIC_BASE_URL</span><span style="color:#8b8fa8">=http://localhost:4100/v1</span></div>
-            <div style="margin-top:6px"><span style="color:#4a4d62"># OpenAI</span></div>
-            <div><span style="color:#7c3aed">OPENAI_BASE_URL</span><span style="color:#8b8fa8">=http://localhost:4100/v1</span></div>
-          </div>
+        <div class="bento-icon blue"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#3b82f6" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg></div>
+        <div class="bento-title">Anthropic + OpenAI</div>
+        <div class="bento-desc">Works with all major providers OpenClaw supports. Accurate pricing for Claude, GPT-4o, o3, and Gemini models built in. Unknown models fall back to Sonnet rates.</div>
+        <div class="terminal">
+          <div><span class="t-comment"># Anthropic</span></div>
+          <div><span class="t-prompt">ANTHROPIC_BASE_URL</span><span class="t-out">=http://localhost:4100/v1</span></div>
+          <div>&nbsp;</div>
+          <div><span class="t-comment"># OpenAI</span></div>
+          <div><span class="t-prompt">OPENAI_BASE_URL</span><span class="t-out">=http://localhost:4100/v1</span></div>
         </div>
       </div>
     </div>
@@ -962,12 +629,11 @@ footer {
   <div class="container">
     <div class="section-label reveal">How it works</div>
     <h2 class="section-title reveal reveal-delay-1">Up and running<br>in under 5 minutes.</h2>
-
     <div class="steps">
       <div class="step reveal">
         <div class="step-num">Step 01</div>
         <div class="step-title">Install and start the proxy</div>
-        <div class="step-desc">Clone the repo, run <code style="font-family:monospace;font-size:12px;color:var(--violet2)">npm install</code>, and start ClawCost. It binds to <code style="font-family:monospace;font-size:12px;color:var(--violet2)">localhost:4100</code>.</div>
+        <div class="step-desc">Clone the repo, run <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--brand2)">npm install</code>, and start ClawCost. It binds to <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--brand2)">localhost:4100</code>.</div>
         <div class="step-code"><span>$</span> npm run dev</div>
       </div>
       <div class="step reveal reveal-delay-1">
@@ -991,18 +657,13 @@ footer {
   <div class="container">
     <div style="text-align:center">
       <div class="section-label reveal" style="justify-content:center">Pricing</div>
-      <h2 class="section-title reveal reveal-delay-1">Free to self-host.<br>Pro for teams who mean business.</h2>
-      <p class="section-sub reveal reveal-delay-2" style="margin:0 auto 0">Open source and free forever for individual devs. Upgrade to Pro for per-model budgets, 90-day history, cost forecasting, and custom alert thresholds.</p>
-    </div>
-
+      <h2 class="section-title reveal reveal-delay-1">Free to run yourself.<br>Hosted tier coming soon.</h2>
+      <p class="section-sub reveal reveal-delay-2" style="margin:0 auto">The self-hosted version — including Slack and email alerts — is free forever. A managed hosted version with no server required is in early access.</p>    </div>
     <div class="pricing-grid">
       <div class="pricing-card reveal reveal-delay-1">
         <div class="pricing-tier">Open Source</div>
-        <div class="pricing-price">
-          <span class="pricing-amount">Free</span>
-        </div>
-        <p class="pricing-desc">Self-host on your own machine. Full proxy and dashboard with alerts — no limits, forever.</p>
-        <div class="pricing-divider"></div>
+        <div class="pricing-price"><span class="pricing-amount">Free</span></div>
+        <p class="pricing-desc">Self-host on your own machine. Full feature set including alerts — no limits, forever.</p>        <div class="pricing-divider"></div>
         <ul class="pricing-features">
           <li>Proxy for OpenAI, Anthropic, Gemini, DeepSeek</li>
           <li>Real-time per-model token tracking</li>
@@ -1017,16 +678,11 @@ footer {
         </ul>
         <a href="https://github.com/ModologyStudiosLLC/clawcost" class="pricing-btn outline" target="_blank">View on GitHub →</a>
       </div>
-
       <div class="pricing-card featured reveal reveal-delay-2">
         <div class="pricing-badge">Available now</div>
         <div class="pricing-tier">Pro</div>
-        <div class="pricing-price">
-          <span class="pricing-amount">$19</span>
-          <span class="pricing-per">/mo</span>
-        </div>
-        <p class="pricing-desc">Everything in Open Source, plus the controls serious teams need to stay on budget.</p>
-        <div class="pricing-divider"></div>
+        <div class="pricing-price"><span class="pricing-amount">$12</span><span class="pricing-per">/mo</span></div>
+        <p class="pricing-desc">Fully managed. No server, no terminal, no maintenance — just point your API key at us.</p>        <div class="pricing-divider"></div>
         <ul class="pricing-features">
           <li>Everything in Open Source</li>
           <li>90-day cost history</li>
@@ -1039,16 +695,11 @@ footer {
         </ul>
         <a href="https://buy.stripe.com/8x214ocjp83lapTafG2Fa01" class="pricing-btn solid" target="_blank">Get Pro — $19/mo →</a>
       </div>
-
       <div class="pricing-card reveal reveal-delay-3">
         <div class="pricing-badge" style="background:rgba(59,130,246,0.15);color:#60a5fa">Coming Soon</div>
         <div class="pricing-tier">Team</div>
-        <div class="pricing-price">
-          <span class="pricing-amount">$49</span>
-          <span class="pricing-per">/mo</span>
-        </div>
-        <p class="pricing-desc">Shared cost visibility and budget controls across your entire engineering team.</p>
-        <div class="pricing-divider"></div>
+        <div class="pricing-price"><span class="pricing-amount">$49</span><span class="pricing-per">/mo</span></div>
+        <p class="pricing-desc">Shared visibility and controls across your whole agent fleet.</p>        <div class="pricing-divider"></div>
         <ul class="pricing-features">
           <li>Everything in Pro</li>
           <li>Up to 10 team members</li>
@@ -1105,8 +756,9 @@ footer {
   <div class="container">
     <div class="footer-inner">
       <a href="/" class="footer-logo">
-        <img src="/icon.svg" class="nav-logo-mark" alt="ClawCost icon" width="22" height="22" style="width:22px;height:22px">
-        ClawCost
+        <div class="nav-logo-mark" style="width:22px;height:22px">
+          <svg width="11" height="11" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>        ClawCost
       </a>
       <div class="footer-links">
         <a href="https://github.com/ModologyStudiosLLC/clawcost" class="footer-link" target="_blank">GitHub</a>
@@ -1128,7 +780,7 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 // Copy install command
 document.querySelector('.install-block').addEventListener('click', function() {
   navigator.clipboard?.writeText('npm install && npm run dev');
-  this.style.borderColor = 'rgba(34,197,94,0.5)';
+  this.style.borderColor = 'rgba(0,212,126,0.5)';
   setTimeout(() => this.style.borderColor = '', 1200);
 });
 
