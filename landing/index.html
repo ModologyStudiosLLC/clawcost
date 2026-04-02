@@ -319,6 +319,15 @@ section { position: relative; z-index: 1; }
 .install-block { display: inline-flex; align-items: center; gap: 12px; background: #08090e; border: 1px solid var(--border2); border-radius: 10px; padding: 12px 20px; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text); cursor: pointer; user-select: none; transition: border-color 0.2s, background 0.2s; margin-bottom: 32px; }
 .install-block:hover { border-color: rgba(232,150,30,0.4); background: rgba(232,150,30,0.03); }
 .install-block span { color: var(--brand); }
+/* ─── ClawHQ Banner ──────────────────────────────────────────────────────── */
+.clawhq-banner { position: relative; z-index: 1; border-top: 1px solid var(--border); background: linear-gradient(135deg, rgba(105,218,255,0.04) 0%, rgba(0,212,126,0.03) 100%); padding: 56px 0; }
+.clawhq-banner-inner { display: grid; grid-template-columns: 1fr auto; gap: 48px; align-items: center; }
+.clawhq-banner-label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brand); font-family: 'JetBrains Mono', monospace; margin-bottom: 12px; }
+.clawhq-banner-headline { font-family: 'Space Grotesk', sans-serif; font-size: clamp(22px, 2.5vw, 34px); font-weight: 700; letter-spacing: -0.03em; color: var(--text); line-height: 1.15; margin-bottom: 12px; }
+.clawhq-banner-sub { font-size: 15px; color: var(--text2); line-height: 1.6; max-width: 480px; }
+.clawhq-banner-cta { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: var(--bg); border: 1px solid rgba(105,218,255,0.25); border-radius: 10px; font-size: 14px; font-weight: 600; color: #69daff; text-decoration: none; font-family: 'Space Grotesk', sans-serif; transition: border-color 0.2s, background 0.2s, box-shadow 0.2s; white-space: nowrap; flex-shrink: 0; }
+.clawhq-banner-cta:hover { border-color: rgba(105,218,255,0.5); background: rgba(105,218,255,0.05); box-shadow: 0 4px 16px rgba(105,218,255,0.12); }
+@media (max-width: 768px) { .clawhq-banner-inner { grid-template-columns: 1fr; gap: 24px; } }
 /* ─── Footer ─────────────────────────────────────────────────────────────── */
 footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 32px 0; background: rgba(255,255,255,0.008); }
 .footer-inner { display: flex; align-items: center; gap: 24px; }
@@ -750,6 +759,22 @@ footer { position: relative; z-index: 1; border-top: 1px solid var(--border); pa
     </div>
   </div>
 </section>
+
+<!-- ClawHQ Banner -->
+<div class="clawhq-banner">
+  <div class="container">
+    <div class="clawhq-banner-inner">
+      <div>
+        <div class="clawhq-banner-label">From the same team</div>
+        <div class="clawhq-banner-headline">Want AI that does more than track costs?</div>
+        <p class="clawhq-banner-sub">ClawHQ is a self-hosted AI team platform — 30+ agents, Discord and Slack wired up, one Docker command to deploy. Engineering, sales, and support packs included.</p>
+      </div>
+      <a href="https://clawhqplatform.com" target="_blank" rel="noopener noreferrer" class="clawhq-banner-cta">
+        Meet ClawHQ →
+      </a>
+    </div>
+  </div>
+</div>
 
 <!-- Footer -->
 <footer>
