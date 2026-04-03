@@ -14,8 +14,12 @@ import { exportCsv, exportJson, exportSummary } from './export.js';
 
 const app = Fastify({ logger: false });
 
-// Raw body passthrough for all content types (override Fastify's built-in JSON parser too)
-app.addContentTypeParser('application/json', { parseAs: 'buffer' }, (_req, body, done) => done(null, body));
+// Parse JSON normally but stash the raw string on req for Stripe webhook signature verification.
+app.addContentTypeParser('application/json', { parseAs: 'string' }, (req, body, done) => {
+  (req as any).rawBody = Buffer.from(body as string);
+  try { done(null, JSON.parse(body as string)); } catch (e) { done(e as Error, undefined); }
+});
+// Passthrough for all other content types
 app.addContentTypeParser('*', { parseAs: 'buffer' }, (_req, body, done) => done(null, body));
 
 // ── Auth hook for all API routes (except proxy /v1/*) ─────────────────────
@@ -261,7 +265,7 @@ app.post('/billing/webhook', async (req, reply) => {
     return;
   }
   try {
-    const result = await handleWebhook(req.body as Buffer, sig);
+    const result = await handleWebhook((req as any).rawBody as Buffer, sig);
     reply.send(result);
   } catch (err) {
     console.error('[ClawCost] Webhook error:', String(err));
