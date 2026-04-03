@@ -6,6 +6,15 @@ Sits between your app and OpenAI, Anthropic, Gemini, DeepSeek, or any OpenAI-com
 
 ## Quick Start
 
+Install globally via npm:
+
+```bash
+npm install -g @modologystudios/clawcost
+clawcost
+```
+
+Or run from source:
+
 ```bash
 npm install
 npm run dev
