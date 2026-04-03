@@ -1,5 +1,5 @@
 {
-  "name": "clawcost",
+  "name": "@modologystudios/clawcost",
   "version": "0.1.0",
   "description": "Self-hosted LLM cost tracking and budget enforcement proxy for any AI dev team",
   "license": "MIT",
@@ -10,7 +10,8 @@
     "clawcost": "dist/index.js"
   },
   "files": [
-    "dist/"
+    "dist/",
+    "!dist/tests/"
   ],
   "scripts": {
     "dev": "tsx src/index.ts",
