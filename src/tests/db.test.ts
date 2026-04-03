@@ -92,8 +92,8 @@ describe('model budgets', () => {
     setModelBudget('claude-opus-4-6', 1.00, 10.00);
     const budget = getModelBudget('claude-opus-4-6');
     expect(budget).toBeDefined();
-    expect(budget.daily_limit).toBe(1.00);
-    expect(budget.monthly_limit).toBe(10.00);
+    expect(budget!.daily_limit).toBe(1.00);
+    expect(budget!.monthly_limit).toBe(10.00);
   });
 
   it('returns undefined for model with no budget', () => {
