@@ -10,5 +10,15 @@
   },
   "compatibility_flags": [
     "nodejs_compat"
+  ],
+  "routes": [
+    {
+      "pattern": "getclawcost.com/*",
+      "zone_name": "getclawcost.com"
+    },
+    {
+      "pattern": "www.getclawcost.com/*",
+      "zone_name": "getclawcost.com"
+    }
   ]
 }
