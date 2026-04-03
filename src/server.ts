@@ -44,13 +44,13 @@ function resolveUpstream(authHeader: string | undefined): Upstream {
   if (key === 'metaclaw' || key.startsWith('sk-swesle')) {
     return { protocol: 'http', host: '127.0.0.1', port: 30000, pathPrefix: '', name: 'metaclaw' };
   }
+  // OpenRouter — keys start with sk-or-
+  if (key.startsWith('sk-or-')) {
+    return { protocol: 'https', host: 'openrouter.ai', port: 443, pathPrefix: '/api', name: 'openrouter' };
+  }
   // DeepSeek
   if (key.startsWith('sk-56557') || key.startsWith('sk-deepseek')) {
     return { protocol: 'https', host: 'api.deepseek.com', port: 443, pathPrefix: '', name: 'deepseek' };
-  }
-  // ZAI (GLM)
-  if (key.length > 20 && !key.startsWith('sk-ant') && !key.startsWith('sk-proj') && !key.startsWith('sk-') ) {
-    // ZAI keys don't follow a known prefix — fall through to Anthropic/OpenAI detection below
   }
   // Anthropic
   if (authHeader && (key.startsWith('sk-ant') || key.startsWith('sk-proj'))) {
