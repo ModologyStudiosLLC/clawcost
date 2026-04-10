@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAQ — ClawCost LLM Cost Tracking</title>
+<meta name="description" content="Answers to common questions about ClawCost — how it tracks LLM costs, enforces budgets, works with Anthropic and OpenAI, and how it compares to alternatives.">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<meta property="og:title" content="FAQ — ClawCost LLM Cost Tracking">
+<meta property="og:description" content="How ClawCost tracks tokens, enforces budgets, and prevents surprise AI bills.">
+<meta property="og:url" content="https://getclawcost.com/faq/">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "ClawCost",
+  "url": "https://getclawcost.com",
+  "logo": "https://getclawcost.com/favicon-32.png",
+  "description": "Local-first LLM cost proxy that tracks every token, enforces hard spending budgets, and prevents surprise AI bills. Works with Anthropic, OpenAI, Gemini, DeepSeek, and any OpenAI-compatible API.",
+  "sameAs": [
+    "https://github.com/ModologyStudiosLLC/clawcost"
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is ClawCost?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ClawCost is a local-first, open-source LLM cost tracking proxy. It sits between your application and LLM providers (Anthropic, OpenAI, Gemini, DeepSeek, and any OpenAI-compatible API), tracking every token in real time, enforcing budget limits, and showing a live cost dashboard. All data is stored locally in SQLite — nothing leaves your machine. Free to self-host; Pro plan ($19/mo) adds per-model budgets, spend forecasting, and 90-day history."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I track LLM API costs?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ClawCost is an open-source proxy that sits between your app and any LLM provider. Change your base URL to http://localhost:4100/v1 — ClawCost automatically tracks every token and calculates real-time costs. No code changes required. Install with: npm install -g @modologystudios/clawcost then run clawcost."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I prevent surprise AI API bills?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ClawCost enforces hard daily and monthly spending budgets. When your spend hits the limit, ClawCost blocks further requests with HTTP 429 before any additional charges occur. Set your budget in the .env file or live in the dashboard — no application code changes needed."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does ClawCost work with Claude and the Anthropic API?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. ClawCost supports Anthropic's API natively. Set ANTHROPIC_BASE_URL=http://localhost:4100/v1 and ClawCost proxies all requests, tracking token usage and cost for every model including Claude Haiku, Claude Sonnet, and Claude Opus."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does ClawCost add latency to LLM API calls?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No measurable latency. ClawCost streams responses directly from the provider to your app while parsing SSE events in parallel to extract token usage. It does not buffer responses, so your application sees the same streaming behavior as a direct API call."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does ClawCost store my API keys or usage data?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. ClawCost is local-first by design. Your API keys pass through the proxy to the provider but are never logged or stored. All usage data is saved to a local SQLite database at ~/.clawcost/usage.db on your own machine. Nothing is sent to external servers."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is ClawCost open source?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. ClawCost is MIT-licensed and available on GitHub at github.com/ModologyStudiosLLC/clawcost. The core proxy — token tracking, budget enforcement, local dashboard — is free forever. ClawCost Pro ($19/mo) adds per-model budget caps, 90-day history, spend forecasting, and custom alert thresholds."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How is ClawCost different from Helicone?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ClawCost is local-first — your data never leaves your machine. Helicone routes your requests through their cloud infrastructure. ClawCost also enforces hard budget limits that block requests before charges occur, which Helicone does not. ClawCost is best for developers who want cost control with full data privacy; Helicone suits teams that want cloud-hosted observability and collaboration features."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How is ClawCost different from LiteLLM?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LiteLLM is a multi-provider routing layer focused on model abstraction and load balancing. ClawCost is focused on cost visibility and budget enforcement. They serve different purposes and can be used together: LiteLLM for routing, ClawCost for cost control."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which LLM providers does ClawCost support?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ClawCost supports Anthropic, OpenAI, Google Gemini, DeepSeek, and any OpenAI-compatible API. Provider is detected automatically from the model name in the request."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I set a spending budget for my LLM usage?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Set CLAWCOST_DAILY_BUDGET and CLAWCOST_MONTHLY_BUDGET in your .env file before starting ClawCost. You can also update budgets live in the dashboard without restarting. When spend reaches your limit, ClawCost returns HTTP 429 to block further requests."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is ClawCost Pro?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ClawCost Pro ($19/mo) adds per-model budget caps, 90-day cost history, spend forecasting, custom alert thresholds, and outbound webhooks for Slack, Discord, or any endpoint. After purchasing at getclawcost.com, enter your email in the Pro panel on the dashboard to activate."
+      }
+    }
+  ]
+}
+</script>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+:root {
+  --bg:        #07080c;
+  --surface:   #0d0f18;
+  --surface2:  #131822;
+  --border:    rgba(255,255,255,0.07);
+  --border2:   rgba(255,255,255,0.12);
+  --text:      #eaedf5;
+  --text2:     #8891a8;
+  --text3:     #484d68;
+  --brand:     #e8961e;
+  --brand2:    #ffc04d;
+  --green:     #00d47e;
+  --red:       #ff4545;
+  --radius:    14px;
+  --radius-sm: 8px;
+}
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+h1, h2, h3 { font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif; }
+.container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+.bg-grid {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%);
+}
+/* Nav */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  background: rgba(7,8,12,0.85);
+}
+.nav-inner { display: flex; align-items: center; gap: 32px; height: 60px; }
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px; font-weight: 700; color: var(--text); text-decoration: none;
+  letter-spacing: -0.02em;
+}
+.nav-logo-mark {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: linear-gradient(135deg, #e8961e, #c97a10);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 14px rgba(232,150,30,0.4); flex-shrink: 0;
+}
+.nav-links { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.nav-link {
+  font-size: 14px; font-weight: 500; color: var(--text2);
+  text-decoration: none; padding: 6px 12px; border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+}
+.nav-link:hover, .nav-link.active { color: var(--text); background: rgba(255,255,255,0.05); }
+.nav-cta {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 14px; font-weight: 600; color: #0a0a0e;
+  background: var(--brand); border-radius: 8px;
+  padding: 7px 16px; text-decoration: none;
+  box-shadow: 0 0 20px rgba(232,150,30,0.3);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+.nav-cta:hover { background: var(--brand2); box-shadow: 0 0 32px rgba(232,150,30,0.5); transform: translateY(-1px); }
+/* Page header */
+.page-header {
+  position: relative; z-index: 1;
+  padding: 120px 0 64px; text-align: center;
+}
+.page-header-glow {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 700px; height: 400px; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 0%, rgba(232,150,30,0.05) 0%, transparent 60%);
+}
+.section-label {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--brand); margin-bottom: 16px; font-family: 'JetBrains Mono', monospace;
+}
+.section-label::before { content: ''; display: block; width: 16px; height: 1px; background: var(--brand); opacity: 0.6; }
+.page-header h1 {
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 700; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 16px;
+}
+.grad-text {
+  background: linear-gradient(135deg, #ffffff 20%, #ffc04d 65%, #e8961e 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.page-header p { font-size: 17px; color: var(--text2); max-width: 480px; margin: 0 auto; }
+/* FAQ */
+.faq-section { position: relative; z-index: 1; padding: 0 0 100px; }
+.faq-grid { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 2px; }
+.faq-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.faq-item:hover { border-color: var(--border2); }
+.faq-item.open { border-color: rgba(232,150,30,0.25); }
+.faq-q {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 20px 24px;
+  background: none; border: none; cursor: pointer; text-align: left;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px; font-weight: 600; color: var(--text);
+  transition: color 0.2s;
+}
+.faq-q:hover { color: var(--brand2); }
+.faq-icon {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background 0.2s, transform 0.25s;
+  color: var(--text2);
+}
+.faq-item.open .faq-icon { background: rgba(232,150,30,0.12); border-color: rgba(232,150,30,0.3); color: var(--brand); transform: rotate(45deg); }
+.faq-a {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.16,1,0.3,1), padding 0.25s;
+  padding: 0 24px;
+}
+.faq-item.open .faq-a { max-height: 400px; padding: 0 24px 20px; }
+.faq-a p {
+  font-size: 14px; color: var(--text2); line-height: 1.75;
+  border-top: 1px solid var(--border); padding-top: 16px;
+}
+.faq-a code {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+  padding: 1px 6px; border-radius: 4px; color: var(--brand2);
+}
+/* Category headings */
+.faq-category {
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--text3); font-family: 'JetBrains Mono', monospace;
+  padding: 32px 0 12px; margin-top: 8px;
+}
+.faq-category:first-child { padding-top: 0; }
+/* CTA */
+.faq-cta {
+  position: relative; z-index: 1;
+  max-width: 760px; margin: 0 auto 80px;
+  background: var(--surface); border: 1px solid rgba(232,150,30,0.2);
+  border-radius: var(--radius); padding: 40px 48px;
+  display: flex; align-items: center; justify-content: space-between; gap: 32px;
+}
+.faq-cta h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+.faq-cta p { font-size: 14px; color: var(--text2); }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--brand); color: #0a0a0e;
+  font-size: 14px; font-weight: 600; padding: 11px 22px; border-radius: 9px;
+  text-decoration: none; white-space: nowrap;
+  box-shadow: 0 0 24px rgba(232,150,30,0.3);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+.btn-primary:hover { background: var(--brand2); transform: translateY(-1px); }
+/* ClawHQ Banner */
+.clawhq-banner { position: relative; z-index: 1; border-top: 1px solid var(--border); background: linear-gradient(135deg, rgba(105,218,255,0.04) 0%, rgba(0,212,126,0.03) 100%); padding: 56px 0; }
+.clawhq-banner-inner { display: grid; grid-template-columns: 1fr auto; gap: 48px; align-items: center; }
+.clawhq-banner-label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brand); font-family: 'JetBrains Mono', monospace; margin-bottom: 12px; }
+.clawhq-banner-headline { font-family: 'Space Grotesk', sans-serif; font-size: clamp(22px, 2.5vw, 34px); font-weight: 700; letter-spacing: -0.03em; color: var(--text); line-height: 1.15; margin-bottom: 12px; }
+.clawhq-banner-sub { font-size: 15px; color: var(--text2); line-height: 1.6; max-width: 480px; }
+.clawhq-banner-cta { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: var(--bg); border: 1px solid rgba(105,218,255,0.25); border-radius: 10px; font-size: 14px; font-weight: 600; color: #69daff; text-decoration: none; font-family: 'Space Grotesk', sans-serif; transition: border-color 0.2s, background 0.2s, box-shadow 0.2s; white-space: nowrap; flex-shrink: 0; }
+.clawhq-banner-cta:hover { border-color: rgba(105,218,255,0.5); background: rgba(105,218,255,0.05); box-shadow: 0 4px 16px rgba(105,218,255,0.12); }
+/* Footer */
+footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 32px 0; background: rgba(255,255,255,0.008); }
+.footer-inner { display: flex; align-items: center; gap: 24px; }
+.footer-logo { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--text2); text-decoration: none; font-family: 'Space Grotesk', sans-serif; transition: color 0.2s; }
+.footer-logo:hover { color: var(--text); }
+.footer-links { display: flex; gap: 24px; }
+.footer-link { font-size: 13px; color: var(--text2); text-decoration: none; transition: color 0.2s; }
+.footer-link:hover { color: var(--text); }
+.footer-right { font-size: 13px; color: var(--text3); margin-left: auto; }
+@media (max-width: 768px) {
+  .clawhq-banner-inner { grid-template-columns: 1fr; gap: 24px; }
+  .faq-cta { flex-direction: column; padding: 28px 24px; }
+  .nav-links a:not(.nav-cta) { display: none; }
+  .footer-inner { flex-wrap: wrap; }
+  .footer-right { width: 100%; margin-left: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-grid" aria-hidden="true"></div>
+
+<nav>
+  <div class="container nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      ClawCost
+    </a>
+    <div class="nav-links">
+      <a href="/#features" class="nav-link">Features</a>
+      <a href="/#pricing" class="nav-link">Pricing</a>
+      <a href="/faq/" class="nav-link active">FAQ</a>
+      <a href="/blog/" class="nav-link">Blog</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-link" target="_blank">GitHub</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-cta" target="_blank">
+        Get started free
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-glow" aria-hidden="true"></div>
+  <div class="container">
+    <div class="section-label">FAQ</div>
+    <h1>Frequently asked <span class="grad-text">questions</span></h1>
+    <p>Everything you need to know about tracking and controlling your LLM API spend.</p>
+  </div>
+</div>
+
+<section class="faq-section">
+  <div class="container">
+    <div class="faq-grid">
+
+      <div class="faq-category">General</div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          What is ClawCost?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        </button>
+        <div class="faq-a"><p>ClawCost is a local-first, open-source LLM cost tracking proxy. It sits between your application and any LLM provider — Anthropic, OpenAI, Gemini, DeepSeek, or any OpenAI-compatible API — tracking every token in real time, enforcing hard budget limits, and showing a live cost dashboard. All usage data stays in a local SQLite file on your machine. Free to self-host; Pro ($19/mo) adds per-model budgets and spend forecasting.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Who is ClawCost for?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        </button>
+        <div class="faq-a"><p>Developers and teams that call LLM APIs (OpenAI, Anthropic, Gemini, etc.) and want to know exactly what they're spending — and stop spending when they hit a limit. Particularly useful for local AI tooling setups like OpenClaw, LangChain agents, and automated pipelines that can run unexpectedly long overnight.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Is ClawCost open source?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        </button>
+        <div class="faq-a"><p>Yes. ClawCost is MIT-licensed and the full source is on <a href="https://github.com/ModologyStudiosLLC/clawcost" target="_blank" style="color:var(--brand)">GitHub</a>. The core proxy — token tracking, budget enforcement, local dashboard, and multi-provider support — is free forever. ClawCost Pro ($19/mo) adds per-model budget caps, 90-day history, spend forecasting, and webhook alerts.</p></div>
+      </div>
+
+      <div class="faq-category">Setup</div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          How do I install ClawCost?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        </button>
+        <div class="faq-a"><p>Install globally: <code>npm install -g @modologystudios/clawcost</code>, then run <code>clawcost</code>. Your dashboard opens at <code>http://localhost:4100</code>. Then point your app's LLM base URL to <code>http://localhost:4100/v1</code> — that's it. No code changes required beyond the base URL.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          How do I use ClawCost with Claude / Anthropic API?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        </button>
+        <div class="faq-a"><p>Set <code>ANTHROPIC_BASE_URL=http://localhost:4100/v1</code> in your environment before running your app. ClawCost detects Anthropic models automatically and routes to the correct upstream. For OpenClaw specifically, add it to <code>~/.openclaw/.env</code>.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Which LLM providers are supported?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        </button>
+        <div class="faq-a"><p>Anthropic, OpenAI, Google Gemini, DeepSeek, and any OpenAI-compatible API (Ollama, Groq, Together AI, Fireworks, etc.). Provider routing is automatic — ClawCost detects the correct upstream from the model name in each request.</p></div>
+      </div>
+
+      <div class="faq-category">Budgets &amp; Tracking</div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          How do I set a spending budget?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        </button>
+        <div class="faq-a"><p>Set <code>CLAWCOST_DAILY_BUDGET</code> and <code>CLAWCOST_MONTHLY_BUDGET</code> (in USD) in your <code>.env</code> file. You can also update limits live in the dashboard without restarting. When spend reaches your limit, ClawCost returns HTTP 429 to block further requests before any additional charges occur on your provider account.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Does ClawCost add latency to my API calls?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        </button>
+        <div class="faq-a"><p>No measurable latency. ClawCost streams the provider's response directly to your app while parsing SSE events in parallel to extract token counts. It never buffers the full response, so you see the same first-token and streaming latency as a direct API call.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Does ClawCost store my API keys or send my data anywhere?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        </button>
+        <div class="faq-a"><p>No. ClawCost is local-first by design. Your API keys pass through the proxy to the provider but are never logged or persisted. All usage data (token counts, costs, request history) is stored in a local SQLite database at <code>~/.clawcost/usage.db</code>. Nothing is sent to external servers.</p></div>
+      </div>
+
+      <div class="faq-category">Comparisons</div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          How is ClawCost different from Helicone?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        </button>
+        <div class="faq-a"><p>ClawCost is local-first — your usage data never leaves your machine. Helicone routes requests through their cloud infrastructure for logging and analytics. ClawCost also enforces hard budget limits that block requests before charges occur; Helicone doesn't do this. <a href="/vs-helicone/" style="color:var(--brand)">Full comparison →</a></p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          How is ClawCost different from LiteLLM?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        </button>
+        <div class="faq-a"><p>LiteLLM is a routing and model-abstraction layer — it normalizes APIs across providers and handles load balancing. ClawCost is focused on cost tracking and budget enforcement. They solve different problems and work well together. <a href="/vs-litellm/" style="color:var(--brand)">Full comparison →</a></p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          How is ClawCost different from LangSmith?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        </button>
+        <div class="faq-a"><p>LangSmith is full-stack LLM observability — traces, evaluations, datasets, prompt management. It's a powerful platform for teams building complex LLM applications. ClawCost is narrowly focused: cost tracking and hard budget enforcement, local-first, five-minute setup. If you just want to stop surprise bills without adopting a full observability stack, ClawCost is the right tool. <a href="/vs-langsmith/" style="color:var(--brand)">Full comparison →</a></p></div>
+      </div>
+
+      <div class="faq-category">Pro Plan</div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          What does ClawCost Pro add?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        </button>
+        <div class="faq-a"><p>Pro ($19/mo) adds: per-model budget caps (set independent limits for GPT-4o vs Claude Sonnet, for example), 90-day cost history, spend forecasting (projected month-end cost based on current burn rate), custom alert thresholds, and outbound webhooks to post alerts to Slack, Discord, or any endpoint. After purchasing, enter your email in the Pro panel on the dashboard to activate.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Can I cancel Pro anytime?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+        </button>
+        <div class="faq-a"><p>Yes. Cancel anytime — your Pro features stay active until the end of your billing period, then drop back to the free tier. The free tier has no limits on duration or number of requests tracked.</p></div>
+      </div>
+
+    </div>
+
+    <div class="faq-cta">
+      <div>
+        <h3>Still have questions?</h3>
+        <p>Open an issue on GitHub or email us at <a href="mailto:hello@modology.dev" style="color:var(--brand)">hello@modology.dev</a></p>
+      </div>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="btn-primary" target="_blank">
+        Get started free
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="clawhq-banner">
+  <div class="container">
+    <div class="clawhq-banner-inner">
+      <div>
+        <div class="clawhq-banner-label">From the same team</div>
+        <div class="clawhq-banner-headline">Want AI that does more than track costs?</div>
+        <p class="clawhq-banner-sub">ClawHQ is a self-hosted AI team platform — 30+ agents, Discord and Slack wired up, one Docker command to deploy.</p>
+      </div>
+      <a href="https://clawhqplatform.com" target="_blank" rel="noopener noreferrer" class="clawhq-banner-cta">Meet ClawHQ →</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a href="/" class="footer-logo">
+        <div class="nav-logo-mark" style="width:22px;height:22px">
+          <svg width="11" height="11" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        ClawCost
+      </a>
+      <div class="footer-links">
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="footer-link" target="_blank">GitHub</a>
+        <a href="/faq/" class="footer-link">FAQ</a>
+        <a href="/vs-helicone/" class="footer-link">vs Helicone</a>
+        <a href="/vs-litellm/" class="footer-link">vs LiteLLM</a>
+        <a href="/vs-langsmith/" class="footer-link">vs LangSmith</a>
+        <a href="/blog/" class="footer-link">Blog</a>
+      </div>
+      <div class="footer-right">© 2026 Modology Studios</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('.faq-q').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(el => {
+      el.classList.remove('open');
+      el.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+    });
+    if (!isOpen) {
+      item.classList.add('open');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  });
+});
+// Open first item by default
+document.querySelector('.faq-item')?.classList.add('open');
+</script>
+</body>
+</html>

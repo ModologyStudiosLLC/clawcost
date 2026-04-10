@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClawCost vs Helicone — LLM Cost Tracking Comparison</title>
+<meta name="description" content="ClawCost vs Helicone: local-first budget enforcement vs cloud observability. See which LLM monitoring tool fits your needs.">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<meta property="og:title" content="ClawCost vs Helicone — LLM Cost Tracking Comparison">
+<meta property="og:description" content="ClawCost blocks overspend before it hits your card. Helicone shows you what already happened. Here's the full breakdown.">
+<meta property="og:url" content="https://getclawcost.com/vs-helicone/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How is ClawCost different from Helicone?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ClawCost is local-first — your usage data never leaves your machine. Helicone routes requests through their cloud infrastructure. ClawCost enforces hard budget limits that block API requests before charges occur; Helicone provides observability and analytics but does not block spending. ClawCost is free and open source for self-hosting; Helicone has a free tier with paid plans starting at $50/mo for teams."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is ClawCost a good Helicone alternative?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, if your primary goal is preventing unexpected AI bills and keeping data local. ClawCost enforces hard spending budgets, tracks costs in real time, and stores all data in a local SQLite database. It takes 5 minutes to set up and is free to self-host. If you need cloud-hosted observability, team collaboration, prompt management, or LLM evaluation features, Helicone is the stronger fit."
+      }
+    }
+  ]
+}
+</script>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+:root {
+  --bg: #07080c; --surface: #0d0f18; --surface2: #131822;
+  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+  --text: #eaedf5; --text2: #8891a8; --text3: #484d68;
+  --brand: #e8961e; --brand2: #ffc04d; --green: #00d47e; --red: #ff4545;
+  --radius: 14px; --radius-sm: 8px;
+}
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+h1, h2, h3 { font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif; }
+.container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+.bg-grid { position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px); background-size: 32px 32px; mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%); -webkit-mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%); }
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--border); background: rgba(7,8,12,0.85); }
+.nav-inner { display: flex; align-items: center; gap: 32px; height: 60px; }
+.nav-logo { display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); text-decoration: none; letter-spacing: -0.02em; }
+.nav-logo-mark { width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, #e8961e, #c97a10); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 14px rgba(232,150,30,0.4); flex-shrink: 0; }
+.nav-links { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.nav-link { font-size: 14px; font-weight: 500; color: var(--text2); text-decoration: none; padding: 6px 12px; border-radius: 6px; transition: color 0.2s, background 0.2s; }
+.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.nav-cta { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: #0a0a0e; background: var(--brand); border-radius: 8px; padding: 7px 16px; text-decoration: none; box-shadow: 0 0 20px rgba(232,150,30,0.3); transition: background 0.2s, box-shadow 0.2s, transform 0.15s; }
+.nav-cta:hover { background: var(--brand2); transform: translateY(-1px); }
+/* Page header */
+.page-header { position: relative; z-index: 1; padding: 120px 0 64px; text-align: center; }
+.page-header-glow { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 700px; height: 400px; pointer-events: none; background: radial-gradient(ellipse at 50% 0%, rgba(232,150,30,0.05) 0%, transparent 60%); }
+.breadcrumb { font-size: 13px; color: var(--text3); margin-bottom: 20px; }
+.breadcrumb a { color: var(--text2); text-decoration: none; } .breadcrumb a:hover { color: var(--text); }
+.section-label { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--brand); margin-bottom: 16px; font-family: 'JetBrains Mono', monospace; }
+.section-label::before { content: ''; display: block; width: 16px; height: 1px; background: var(--brand); opacity: 0.6; }
+.page-header h1 { font-size: clamp(32px, 4vw, 52px); font-weight: 700; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 16px; }
+.grad-text { background: linear-gradient(135deg, #ffffff 20%, #ffc04d 65%, #e8961e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.page-header p { font-size: 17px; color: var(--text2); max-width: 560px; margin: 0 auto; }
+/* Verdict cards */
+.verdict-section { position: relative; z-index: 1; padding: 0 0 80px; }
+.verdict-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 800px; margin: 0 auto 64px; }
+.verdict-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; }
+.verdict-card.winner { border-color: rgba(232,150,30,0.3); background: linear-gradient(160deg, rgba(232,150,30,0.04) 0%, var(--surface) 60%); }
+.verdict-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; font-family: 'JetBrains Mono', monospace; margin-bottom: 12px; }
+.verdict-tag.cc { color: var(--brand); }
+.verdict-tag.comp { color: var(--text3); }
+.verdict-card h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px; }
+.verdict-card p { font-size: 14px; color: var(--text2); line-height: 1.65; }
+/* Comparison table */
+.compare-section { position: relative; z-index: 1; padding: 0 0 80px; }
+.compare-wrap { max-width: 800px; margin: 0 auto; }
+.compare-heading { font-size: clamp(22px, 3vw, 32px); font-weight: 700; letter-spacing: -0.03em; text-align: center; margin-bottom: 40px; }
+.compare-table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.compare-table th { padding: 16px 20px; font-size: 13px; font-weight: 700; text-align: left; background: var(--surface2); border-bottom: 1px solid var(--border2); font-family: 'Space Grotesk', sans-serif; }
+.compare-table th:first-child { color: var(--text2); width: 35%; }
+.compare-table th.cc { color: var(--brand); }
+.compare-table th.comp { color: var(--text2); }
+.compare-table td { padding: 14px 20px; font-size: 13.5px; color: var(--text2); border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table td:first-child { font-weight: 500; color: var(--text3); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; font-family: 'JetBrains Mono', monospace; }
+.win { color: var(--green); font-weight: 600; }
+.lose { color: var(--text3); }
+.neutral { color: var(--text2); }
+/* When sections */
+.when-section { position: relative; z-index: 1; padding: 0 0 80px; }
+.when-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 800px; margin: 0 auto; }
+.when-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; }
+.when-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+.when-card ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.when-card ul li { font-size: 13.5px; color: var(--text2); display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
+.when-card ul li::before { content: '✓'; color: var(--green); font-weight: 700; font-size: 12px; margin-top: 1px; flex-shrink: 0; }
+/* CTA */
+.cta-bar { position: relative; z-index: 1; max-width: 800px; margin: 0 auto 80px; background: var(--surface); border: 1px solid rgba(232,150,30,0.2); border-radius: var(--radius); padding: 40px 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+.cta-bar h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+.cta-bar p { font-size: 14px; color: var(--text2); }
+.btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--brand); color: #0a0a0e; font-size: 14px; font-weight: 600; padding: 11px 22px; border-radius: 9px; text-decoration: none; white-space: nowrap; box-shadow: 0 0 24px rgba(232,150,30,0.3); transition: background 0.2s, transform 0.15s; }
+.btn-primary:hover { background: var(--brand2); transform: translateY(-1px); }
+/* Banner + footer */
+.clawhq-banner { position: relative; z-index: 1; border-top: 1px solid var(--border); background: linear-gradient(135deg, rgba(105,218,255,0.04) 0%, rgba(0,212,126,0.03) 100%); padding: 56px 0; }
+.clawhq-banner-inner { display: grid; grid-template-columns: 1fr auto; gap: 48px; align-items: center; }
+.clawhq-banner-label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brand); font-family: 'JetBrains Mono', monospace; margin-bottom: 12px; }
+.clawhq-banner-headline { font-family: 'Space Grotesk', sans-serif; font-size: clamp(22px, 2.5vw, 34px); font-weight: 700; letter-spacing: -0.03em; color: var(--text); line-height: 1.15; margin-bottom: 12px; }
+.clawhq-banner-sub { font-size: 15px; color: var(--text2); line-height: 1.6; max-width: 480px; }
+.clawhq-banner-cta { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: var(--bg); border: 1px solid rgba(105,218,255,0.25); border-radius: 10px; font-size: 14px; font-weight: 600; color: #69daff; text-decoration: none; transition: border-color 0.2s, background 0.2s; white-space: nowrap; flex-shrink: 0; }
+.clawhq-banner-cta:hover { border-color: rgba(105,218,255,0.5); background: rgba(105,218,255,0.05); }
+footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 32px 0; background: rgba(255,255,255,0.008); }
+.footer-inner { display: flex; align-items: center; gap: 24px; }
+.footer-logo { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--text2); text-decoration: none; font-family: 'Space Grotesk', sans-serif; }
+.footer-links { display: flex; gap: 24px; }
+.footer-link { font-size: 13px; color: var(--text2); text-decoration: none; transition: color 0.2s; }
+.footer-link:hover { color: var(--text); }
+.footer-right { font-size: 13px; color: var(--text3); margin-left: auto; }
+@media (max-width: 768px) {
+  .verdict-grid, .when-grid { grid-template-columns: 1fr; }
+  .clawhq-banner-inner { grid-template-columns: 1fr; gap: 24px; }
+  .cta-bar { flex-direction: column; padding: 28px 24px; }
+  .nav-links a:not(.nav-cta) { display: none; }
+  .footer-inner { flex-wrap: wrap; }
+  .footer-right { width: 100%; margin-left: 0; }
+}
+</style>
+</head>
+<body>
+<div class="bg-grid" aria-hidden="true"></div>
+
+<nav>
+  <div class="container nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      ClawCost
+    </a>
+    <div class="nav-links">
+      <a href="/#features" class="nav-link">Features</a>
+      <a href="/#pricing" class="nav-link">Pricing</a>
+      <a href="/faq/" class="nav-link">FAQ</a>
+      <a href="/blog/" class="nav-link">Blog</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-link" target="_blank">GitHub</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-cta" target="_blank">Get started free <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+    </div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-glow" aria-hidden="true"></div>
+  <div class="container">
+    <div class="breadcrumb"><a href="/">ClawCost</a> / Comparisons</div>
+    <div class="section-label">Comparison</div>
+    <h1><span class="grad-text">ClawCost</span> vs Helicone</h1>
+    <p>ClawCost blocks overspend before it hits your card. Helicone shows you what already happened. Here's the full breakdown.</p>
+  </div>
+</div>
+
+<section class="verdict-section">
+  <div class="container">
+    <div class="verdict-grid">
+      <div class="verdict-card winner">
+        <div class="verdict-tag cc">ClawCost</div>
+        <h3>Local-first cost control</h3>
+        <p>Hard budget enforcement that blocks requests before charges occur. All data stays on your machine in SQLite. Free to self-host, five-minute setup. Best when privacy and preventing surprise bills are the priority.</p>
+      </div>
+      <div class="verdict-card">
+        <div class="verdict-tag comp">Helicone</div>
+        <h3>Cloud observability platform</h3>
+        <p>Full-featured LLM observability routed through Helicone's cloud. Strong team collaboration, prompt management, and analytics. Best when you need a shared observability layer across a team and don't mind cloud routing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="compare-section">
+  <div class="container">
+    <div class="compare-wrap">
+      <h2 class="compare-heading">Side-by-side comparison</h2>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="cc">ClawCost</th>
+            <th class="comp">Helicone</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Data location</td>
+            <td class="win">Local SQLite — stays on your machine</td>
+            <td class="neutral">Helicone cloud</td>
+          </tr>
+          <tr>
+            <td>Hard budget enforcement</td>
+            <td class="win">Yes — blocks with HTTP 429 before charges</td>
+            <td class="lose">No — observability only</td>
+          </tr>
+          <tr>
+            <td>Open source</td>
+            <td class="win">Yes, MIT licensed</td>
+            <td class="neutral">Partial (SDK open source)</td>
+          </tr>
+          <tr>
+            <td>Setup</td>
+            <td class="win">One env var, 5 minutes</td>
+            <td class="neutral">API key proxy, account required</td>
+          </tr>
+          <tr>
+            <td>Latency added</td>
+            <td class="win">None — streams directly</td>
+            <td class="neutral">Cloud round-trip adds latency</td>
+          </tr>
+          <tr>
+            <td>Free tier</td>
+            <td class="win">Unlimited — full feature set self-hosted</td>
+            <td class="neutral">Free up to 10k requests/mo</td>
+          </tr>
+          <tr>
+            <td>Paid plan</td>
+            <td class="win">$19/mo Pro</td>
+            <td class="neutral">$50–$200+/mo</td>
+          </tr>
+          <tr>
+            <td>Provider support</td>
+            <td class="neutral">Anthropic, OpenAI, Gemini, DeepSeek + any OpenAI-compatible</td>
+            <td class="neutral">Same major providers</td>
+          </tr>
+          <tr>
+            <td>Prompt management</td>
+            <td class="lose">Not included</td>
+            <td class="win">Yes — versioning, A/B testing</td>
+          </tr>
+          <tr>
+            <td>Team collaboration</td>
+            <td class="neutral">Team plan coming soon</td>
+            <td class="win">Built-in shared dashboards</td>
+          </tr>
+          <tr>
+            <td>LLM evaluations</td>
+            <td class="lose">Not included</td>
+            <td class="win">Yes — built-in eval framework</td>
+          </tr>
+          <tr>
+            <td>Request traces</td>
+            <td class="neutral">Basic request log</td>
+            <td class="win">Full trace explorer with metadata</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="when-section">
+  <div class="container">
+    <div class="when-grid">
+      <div class="when-card">
+        <h3>Use ClawCost when you need to...</h3>
+        <ul>
+          <li>Stop a runaway agent or pipeline from billing you overnight</li>
+          <li>Keep all usage data private on your own machine</li>
+          <li>Get cost visibility in under 5 minutes with zero account setup</li>
+          <li>Enforce per-model spending caps (Pro)</li>
+          <li>Use open-source software you can audit and self-host forever</li>
+        </ul>
+      </div>
+      <div class="when-card">
+        <h3>Use Helicone when you need to...</h3>
+        <ul>
+          <li>Share observability data across an engineering team</li>
+          <li>Version and A/B test prompts in a managed platform</li>
+          <li>Run LLM evaluations and track quality metrics</li>
+          <li>Explore detailed request traces with full metadata</li>
+          <li>Integrate with an existing cloud-based MLOps stack</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="cta-bar">
+    <div>
+      <h3>Try ClawCost free</h3>
+      <p>Open source, self-hosted, five-minute setup. No account required.</p>
+    </div>
+    <a href="https://github.com/ModologyStudiosLLC/clawcost" class="btn-primary" target="_blank">
+      Get started free
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</div>
+
+<div class="clawhq-banner">
+  <div class="container">
+    <div class="clawhq-banner-inner">
+      <div>
+        <div class="clawhq-banner-label">From the same team</div>
+        <div class="clawhq-banner-headline">Want AI that does more than track costs?</div>
+        <p class="clawhq-banner-sub">ClawHQ is a self-hosted AI team platform — 30+ agents, Discord and Slack wired up, one Docker command to deploy.</p>
+      </div>
+      <a href="https://clawhqplatform.com" target="_blank" rel="noopener noreferrer" class="clawhq-banner-cta">Meet ClawHQ →</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a href="/" class="footer-logo">
+        <div class="nav-logo-mark" style="width:22px;height:22px"><svg width="11" height="11" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        ClawCost
+      </a>
+      <div class="footer-links">
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="footer-link" target="_blank">GitHub</a>
+        <a href="/faq/" class="footer-link">FAQ</a>
+        <a href="/vs-helicone/" class="footer-link">vs Helicone</a>
+        <a href="/vs-litellm/" class="footer-link">vs LiteLLM</a>
+        <a href="/vs-langsmith/" class="footer-link">vs LangSmith</a>
+        <a href="/blog/" class="footer-link">Blog</a>
+      </div>
+      <div class="footer-right">© 2026 Modology Studios</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
