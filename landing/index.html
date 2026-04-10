@@ -319,6 +319,14 @@ section { position: relative; z-index: 1; }
 .install-block { display: inline-flex; align-items: center; gap: 12px; background: #08090e; border: 1px solid var(--border2); border-radius: 10px; padding: 12px 20px; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text); cursor: pointer; user-select: none; transition: border-color 0.2s, background 0.2s; margin-bottom: 32px; }
 .install-block:hover { border-color: rgba(232,150,30,0.4); background: rgba(232,150,30,0.03); }
 .install-block span { color: var(--brand); }
+/* ─── Waitlist Form ─────────────────────────────────────────────────────── */
+.waitlist-form { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; max-width: 440px; margin: 0 auto; }
+.waitlist-form input[type="email"] { flex: 1; min-width: 200px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 12px 16px; font-size: 14px; font-family: 'Space Grotesk', sans-serif; color: var(--text); outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+.waitlist-form input[type="email"]::placeholder { color: var(--text3); }
+.waitlist-form input[type="email"]:focus { border-color: rgba(232,150,30,0.5); box-shadow: 0 0 0 3px rgba(232,150,30,0.1); }
+.waitlist-form button { padding: 12px 24px; background: var(--brand); color: #07080c; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; cursor: pointer; transition: background 0.2s, box-shadow 0.2s; white-space: nowrap; }
+.waitlist-form button:hover { background: var(--brand2); box-shadow: 0 0 20px rgba(232,150,30,0.35); }
+.waitlist-success { display: none; font-size: 14px; color: var(--green); margin-top: 12px; }
 /* ─── ClawHQ Banner ──────────────────────────────────────────────────────── */
 .clawhq-banner { position: relative; z-index: 1; border-top: 1px solid var(--border); background: linear-gradient(135deg, rgba(105,218,255,0.04) 0%, rgba(0,212,126,0.03) 100%); padding: 56px 0; }
 .clawhq-banner-inner { display: grid; grid-template-columns: 1fr auto; gap: 48px; align-items: center; }
@@ -791,6 +799,10 @@ footer { position: relative; z-index: 1; border-top: 1px solid var(--border); pa
         <a href="https://github.com/ModologyStudiosLLC/clawcost/issues" class="footer-link" target="_blank">Issues</a>
         <a href="/blog/" class="footer-link">Blog</a>
         <a href="#pricing" class="footer-link">Pricing</a>
+        <a href="/faq/" class="footer-link">FAQ</a>
+        <a href="/vs-helicone/" class="footer-link">vs Helicone</a>
+        <a href="/vs-litellm/" class="footer-link">vs LiteLLM</a>
+        <a href="/vs-langsmith/" class="footer-link">vs LangSmith</a>
       </div>
       <div class="footer-right">Built for the OpenClaw community</div>
     </div>
