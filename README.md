@@ -94,6 +94,23 @@ npm start
 
 All usage is stored locally at `~/.clawcost/usage.db` (SQLite). No data leaves your machine.
 
+## How ClawCost compares
+
+| Feature | ClawCost | Helicone | LangSmith | LiteLLM |
+|---|---|---|---|---|
+| **Hard budget enforcement** | ✅ Blocks at limit | ❌ Alerts only | ❌ Alerts only | ❌ No |
+| **Data stays local** | ✅ SQLite on disk | ❌ Cloud | ❌ Cloud | ✅ Self-host |
+| **Zero-latency proxy** | ✅ Streams through | ❌ Adds ~50ms | ❌ Not a proxy | ✅ |
+| **No code changes** | ✅ One env var | ❌ SDK wrapper | ❌ SDK wrapper | ❌ Full config |
+| **Open source** | ✅ MIT | ✅ Partial | ❌ Proprietary | ✅ MIT |
+| **Free tier** | ✅ Full features free | ✅ 10k req/mo | ✅ Limited | ✅ |
+| **Setup time** | ~30 seconds | Minutes | Minutes | 30+ minutes |
+| **Primary purpose** | Cost control + hard limits | Observability + tracing | Evals + tracing | Load balancing + routing |
+
+ClawCost is not a replacement for Helicone or LangSmith — those tools are built for observability and evals. ClawCost's specific job is **preventing surprise bills**: it enforces hard spending limits that block requests when a budget is hit, keeps all data local, and adds zero latency.
+
+[vs Helicone](https://getclawcost.com/vs-helicone/) · [vs LangSmith](https://getclawcost.com/vs-langsmith/) · [vs LiteLLM](https://getclawcost.com/vs-litellm/) · [FAQ](https://getclawcost.com/faq/)
+
 ## License
 
 MIT — [Modology Studios](https://modology.dev)
