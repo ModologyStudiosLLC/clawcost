@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Set Hard Spending Limits on AI Agents (Before They Run Up a $500 Bill) — ClawCost</title>
+<meta name="description" content="AI agents can run up massive API bills when they loop, retry, or spawn sub-agents. Here's how to calculate a safe budget, enforce hard limits, and build agent cost guardrails that actually work.">
+<link rel="canonical" href="https://getclawcost.com/blog/ai-agent-spending-limits/">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<meta property="og:title" content="How to Set Hard Spending Limits on AI Agents (Before They Run Up a $500 Bill)">
+<meta property="og:description" content="AI agents can loop, retry, and spawn sub-agents until your API bill explodes. Here's how to set hard limits that actually hold.">
+<meta property="og:image" content="https://getclawcost.com/og.png">
+<meta property="og:url" content="https://getclawcost.com/blog/ai-agent-spending-limits/">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How to Set Hard Spending Limits on AI Agents (Before They Run Up a $500 Bill)">
+<meta name="twitter:description" content="AI agents can loop, retry, and spawn sub-agents until your API bill explodes. Here's how to set hard limits.">
+<meta name="twitter:image" content="https://getclawcost.com/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "How to Set Hard Spending Limits on AI Agents (Before They Run Up a $500 Bill)",
+  "description": "AI agents can run up massive API bills when they loop, retry, or spawn sub-agents. Here's how to calculate a safe budget and enforce hard limits.",
+  "datePublished": "2026-04-09",
+  "dateModified": "2026-04-09",
+  "author": { "@type": "Organization", "name": "ClawCost" },
+  "publisher": { "@type": "Organization", "name": "ClawCost", "url": "https://getclawcost.com" }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+:root {
+  --bg: #07080c; --surface: #0d0f18; --surface2: #131822;
+  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+  --text: #eaedf5; --text2: #8891a8; --text3: #484d68;
+  --brand: #e8961e; --brand2: #ffc04d; --green: #00d47e;
+  --radius: 14px; --radius-sm: 8px;
+}
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+h1, h2, h3, h4 { font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif; }
+.bg-grid { position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px); background-size: 32px 32px; mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%); -webkit-mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%); }
+.container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--border); background: rgba(7,8,12,0.85); }
+.nav-inner { display: flex; align-items: center; gap: 32px; height: 60px; }
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: -0.02em; }
+.nav-logo-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--brand); display: grid; place-items: center; flex-shrink: 0; }
+.nav-links { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.nav-link { color: var(--text2); text-decoration: none; font-size: 14px; font-weight: 500; padding: 6px 12px; border-radius: var(--radius-sm); transition: color 0.15s, background 0.15s; }
+.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.nav-cta { background: var(--brand); color: #0a0a0e; font-weight: 600; font-size: 14px; padding: 8px 18px; border-radius: var(--radius-sm); text-decoration: none; transition: background 0.15s, box-shadow 0.15s, transform 0.15s; margin-left: 8px; }
+.nav-cta:hover { background: var(--brand2); box-shadow: 0 0 32px rgba(232,150,30,0.5); transform: translateY(-1px); }
+.article-wrap { position: relative; z-index: 1; padding-top: 100px; padding-bottom: 96px; }
+.article-header { max-width: 760px; margin: 0 auto 48px; }
+.article-breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text3); margin-bottom: 20px; }
+.article-breadcrumb a { color: var(--text2); text-decoration: none; }
+.article-breadcrumb a:hover { color: var(--brand); }
+.article-breadcrumb span { color: var(--text3); }
+.article-meta { display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--text2); margin-bottom: 24px; flex-wrap: wrap; }
+.article-tag { background: rgba(232,150,30,0.12); color: var(--brand); padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+h1.article-title { font-size: clamp(28px, 4vw, 46px); font-weight: 700; line-height: 1.15; letter-spacing: -0.03em; color: var(--text); margin-bottom: 20px; }
+.article-subtitle { font-size: 18px; color: var(--text2); line-height: 1.6; max-width: 680px; }
+.article-body { max-width: 760px; margin: 0 auto; }
+.article-body p { margin-bottom: 20px; color: var(--text); font-size: 16px; line-height: 1.75; }
+.article-body h2 { font-size: 26px; font-weight: 700; letter-spacing: -0.025em; margin-top: 52px; margin-bottom: 20px; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+.article-body h3 { font-size: 19px; font-weight: 600; letter-spacing: -0.02em; margin-top: 36px; margin-bottom: 14px; color: var(--text); }
+.article-body ul, .article-body ol { margin: 0 0 20px 20px; color: var(--text); font-size: 16px; line-height: 1.75; }
+.article-body li { margin-bottom: 6px; }
+.article-body strong { color: var(--text); font-weight: 600; }
+.article-body em { color: var(--text2); font-style: italic; }
+.article-body a { color: var(--brand); text-decoration: none; }
+.article-body a:hover { text-decoration: underline; }
+.article-body hr { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+.article-body code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--surface2); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; color: var(--brand2); }
+.article-body pre { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px 24px; margin: 24px 0; overflow-x: auto; }
+.article-body pre code { background: none; border: none; padding: 0; font-size: 13px; color: var(--text2); line-height: 1.8; }
+.table-wrap { overflow-x: auto; margin: 28px 0; border-radius: var(--radius); border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 480px; }
+thead tr { background: var(--surface2); border-bottom: 1px solid var(--border2); }
+thead th { padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text2); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.02); }
+tbody td { padding: 12px 16px; color: var(--text); vertical-align: middle; }
+.td-mono { font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+.td-bad { color: #ff6b6b; font-weight: 600; }
+.td-good { color: var(--green); font-weight: 600; }
+.callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--brand); border-radius: var(--radius-sm); padding: 20px 24px; margin: 32px 0; }
+.callout p { margin: 0; font-size: 15px; }
+.callout-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brand); margin-bottom: 10px; }
+.callout-red { border-left-color: #ff6b6b; }
+.callout-red .callout-title { color: #ff6b6b; }
+.callout-green { border-left-color: var(--green); }
+.callout-green .callout-title { color: var(--green); }
+.budget-calc { background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 28px 32px; margin: 32px 0; }
+.budget-calc-title { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brand); margin-bottom: 16px; }
+.budget-line { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.budget-line:last-child { border-bottom: none; font-weight: 700; font-size: 15px; }
+.budget-line span:last-child { font-family: 'JetBrains Mono', monospace; color: var(--brand2); }
+.article-cta { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 40px; margin-top: 64px; text-align: center; }
+.article-cta h3 { font-size: 22px; font-weight: 700; margin-bottom: 12px; margin-top: 0; }
+.article-cta p { color: var(--text2); margin-bottom: 24px; font-size: 15px; }
+.btn-cta { display: inline-flex; align-items: center; gap: 8px; background: var(--brand); color: #0a0a0e; font-weight: 700; font-size: 15px; padding: 12px 28px; border-radius: var(--radius-sm); text-decoration: none; transition: background 0.15s, box-shadow 0.15s, transform 0.15s; }
+.btn-cta:hover { background: var(--brand2); box-shadow: 0 0 32px rgba(232,150,30,0.4); transform: translateY(-1px); text-decoration: none; }
+.btn-outline { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: var(--text2); font-weight: 500; font-size: 15px; padding: 12px 28px; border-radius: var(--radius-sm); text-decoration: none; border: 1px solid var(--border2); transition: border-color 0.15s, color 0.15s; margin-left: 12px; }
+.btn-outline:hover { border-color: var(--brand); color: var(--brand); text-decoration: none; }
+footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 32px 0; }
+.footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.footer-logo { display: flex; align-items: center; gap: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 15px; color: var(--text); text-decoration: none; letter-spacing: -0.02em; }
+.footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+.footer-link { color: var(--text3); text-decoration: none; font-size: 13px; transition: color 0.15s; }
+.footer-link:hover { color: var(--text2); }
+.footer-right { color: var(--text3); font-size: 13px; }
+@media (max-width: 640px) { .nav-links a:not(.nav-cta) { display: none; } .article-wrap { padding-top: 84px; } .article-body h2 { font-size: 22px; } }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<nav>
+  <div class="container nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg width="14" height="14" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      ClawCost
+    </a>
+    <div class="nav-links">
+      <a href="/#features" class="nav-link">Features</a>
+      <a href="/#pricing" class="nav-link">Pricing</a>
+      <a href="/blog/" class="nav-link" style="color:var(--brand)">Blog</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-link" target="_blank">GitHub</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-cta" target="_blank">Get started →</a>
+    </div>
+  </div>
+</nav>
+
+<main class="article-wrap">
+  <div class="container">
+    <div class="article-header">
+      <div class="article-breadcrumb">
+        <a href="/">ClawCost</a>
+        <span>›</span>
+        <a href="/blog/">Blog</a>
+        <span>›</span>
+        <span>AI Agent Spending Limits</span>
+      </div>
+      <div class="article-meta">
+        <span class="article-tag">Agents</span>
+        <span>April 2026</span>
+        <span>·</span>
+        <span>9 min read</span>
+      </div>
+      <h1 class="article-title">How to Set Hard Spending Limits on Your AI Agents Before They Run Up a $500 Bill</h1>
+      <p class="article-subtitle">AI agents are autonomous by design. That's the point. But without cost guardrails, a single stuck agent, a bad retry loop, or an unexpected multi-agent spawn can consume your entire monthly budget before you notice.</p>
+    </div>
+
+    <div class="article-body">
+
+      <p>Unlike a traditional API call — where you send a request and get a response — an AI agent can make dozens or hundreds of LLM calls autonomously to complete a task. Each call costs money. A task that should take 5 calls can take 50 if the agent gets confused, loops, or decides to spawn sub-agents to help.</p>
+
+      <p>There is no built-in rate limiter at the LLM provider level that protects you from this. Anthropic, OpenAI, and Google will happily process every call your agent sends and bill you for all of them. The responsibility for spending control falls entirely on you.</p>
+
+      <h2>Why Standard Per-Call Limits Don't Work</h2>
+
+      <p>Most developers set a <code>max_tokens</code> limit and call it done. This limits the output size of each individual call — it does not limit how many calls an agent makes or the total money spent.</p>
+
+      <p>Provider accounts have monthly spend limits, but these are high (often $100–$500+ by default for new accounts) and aren't configurable per-agent, per-user, or per-task. By the time you hit the account limit, you've already overspent massively.</p>
+
+      <div class="callout callout-red">
+        <div class="callout-title">A pattern that causes $500+ incidents</div>
+        <p>An agent is given a research task. It decides to call a web search tool to get more context. The tool returns an error. The agent retries. The error persists (rate limit on the search API). The agent tries a different approach, calls the LLM again to reformulate the query, then retries the search again. This loop runs overnight. Each LLM call passes the full growing conversation history. You wake up to a $400 bill for a research task that never completed.</p>
+      </div>
+
+      <h2>How to Calculate a Per-Task Budget</h2>
+
+      <p>Before you can set limits, you need a realistic cost model for your agent. Here's the framework:</p>
+
+      <div class="budget-calc">
+        <div class="budget-calc-title">Agent Task Cost Estimator</div>
+        <div class="budget-line"><span>Expected turns per task</span><span>N turns</span></div>
+        <div class="budget-line"><span>Avg input tokens per turn (context + tools + prompt)</span><span>T_in tokens</span></div>
+        <div class="budget-line"><span>Avg output tokens per turn (reasoning + tool calls)</span><span>T_out tokens</span></div>
+        <div class="budget-line"><span>Input cost</span><span>N × T_in × (input_price / 1M)</span></div>
+        <div class="budget-line"><span>Output cost</span><span>N × T_out × (output_price / 1M)</span></div>
+        <div class="budget-line"><span>Total expected cost</span><span>Input cost + Output cost</span></div>
+      </div>
+
+      <h3>Example: Customer Support Agent on Claude Sonnet 4.6</h3>
+
+      <ul>
+        <li>Expected turns: 6 (average support conversation)</li>
+        <li>Input per turn: 3,000 tokens (system prompt 1,200 + history + user message)</li>
+        <li>Output per turn: 400 tokens (response + tool calls)</li>
+        <li>Input cost: 6 × 3,000 × ($3 / 1,000,000) = <strong>$0.054</strong></li>
+        <li>Output cost: 6 × 400 × ($15 / 1,000,000) = <strong>$0.036</strong></li>
+        <li>Total expected cost per conversation: <strong>$0.09</strong></li>
+      </ul>
+
+      <p>Your per-task budget should be 3–5x the expected cost to absorb variance without cutting off legitimate tasks. In this case: <strong>$0.27–$0.45 per task</strong>.</p>
+
+      <p>Your daily budget should be: daily task volume × per-task budget × safety factor. For 500 conversations/day: 500 × $0.45 × 1.5 = <strong>$337.50/day hard cap</strong>.</p>
+
+      <h2>The Three Layers of Agent Cost Control</h2>
+
+      <h3>Layer 1: Turn Limits (in code)</h3>
+
+      <p>The simplest protection: limit the number of tool call iterations the agent can take before terminating. This is agent-level logic, not LLM-level.</p>
+
+      <pre><code>MAX_TURNS = 15
+
+async def run_agent(task, model, tools):
+    messages = [{"role": "user", "content": task}]
+    turns = 0
+
+    while turns &lt; MAX_TURNS:
+        response = await call_llm(model, messages, tools)
+        turns += 1
+
+        if response.stop_reason == "end_turn":
+            return response.content
+
+        # handle tool calls...
+        messages.append(tool_result)
+
+    raise AgentError(f"Task exceeded {MAX_TURNS} turns — aborting")</code></pre>
+
+      <p>Set <code>MAX_TURNS</code> to 2–3x your expected turns. A support agent that normally takes 6 turns gets a limit of 15. If it's still running at turn 15, something has gone wrong and it's better to abort and alert than to keep billing.</p>
+
+      <h3>Layer 2: Per-Task Token Budget</h3>
+
+      <p>Track cumulative tokens across all turns of a single task. If total input + output tokens exceed your budget, abort the task.</p>
+
+      <pre><code>TOKEN_BUDGET = 50_000  # ~$0.45 at Sonnet 4.6 rates
+
+class AgentSession:
+    def __init__(self):
+        self.total_input_tokens = 0
+        self.total_output_tokens = 0
+
+    def track(self, response):
+        self.total_input_tokens += response.usage.input_tokens
+        self.total_output_tokens += response.usage.output_tokens
+
+    @property
+    def estimated_cost(self):
+        return (
+            self.total_input_tokens * 3 / 1_000_000 +
+            self.total_output_tokens * 15 / 1_000_000
+        )
+
+    def check_budget(self):
+        if self.estimated_cost > 0.45:
+            raise BudgetExceeded(f"Task spent ${self.estimated_cost:.3f}")</code></pre>
+
+      <h3>Layer 3: Global Daily/Monthly Hard Cap via Proxy</h3>
+
+      <p>Application-level limits are good, but they have a gap: they only protect you from the agents you wrote correctly. A bug that bypasses your limits, an untested code path, a newly deployed agent with misconfigured settings — none of these are caught by code you wrote in the agent loop.</p>
+
+      <p>The only way to enforce a truly hard limit is at the network layer, between your code and the LLM provider API. A cost proxy intercepts every API call, tracks cumulative spend, and returns an error (instead of forwarding the request) once the daily or monthly cap is reached.</p>
+
+      <div class="callout callout-green">
+        <div class="callout-title">How ClawCost handles this</div>
+        <p><a href="https://github.com/ModologyStudiosLLC/clawcost">ClawCost</a> runs on <code>localhost:4100</code>. You set <code>OPENAI_BASE_URL=http://localhost:4100/v1</code> and your agents hit the proxy instead of the provider directly. ClawCost counts every token, calculates cost using current model pricing, and enforces daily and monthly limits you configure. When the limit is hit, it returns a <code>429</code> — your agent gets an error and stops, just like a rate limit. The provider never sees the call, and you never pay for it.</p>
+      </div>
+
+      <h2>Setting Realistic Limits: A Reference Table</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Agent type</th>
+              <th>Model</th>
+              <th>Expected cost/task</th>
+              <th>Suggested per-task cap</th>
+              <th>Suggested daily cap (100 tasks)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Customer support (6 turns)</td>
+              <td>Claude Sonnet 4.6</td>
+              <td class="td-mono">$0.09</td>
+              <td class="td-mono">$0.45</td>
+              <td class="td-mono">$45</td>
+            </tr>
+            <tr>
+              <td>Code review (3 turns)</td>
+              <td>Claude Sonnet 4.6</td>
+              <td class="td-mono">$0.06</td>
+              <td class="td-mono">$0.25</td>
+              <td class="td-mono">$25</td>
+            </tr>
+            <tr>
+              <td>Research agent (15 turns)</td>
+              <td>Claude Opus 4.6</td>
+              <td class="td-mono">$1.50</td>
+              <td class="td-mono">$5.00</td>
+              <td class="td-mono">$500</td>
+            </tr>
+            <tr>
+              <td>Data extraction (2 turns)</td>
+              <td>Claude Haiku 4.5</td>
+              <td class="td-mono">$0.008</td>
+              <td class="td-mono">$0.04</td>
+              <td class="td-mono">$4</td>
+            </tr>
+            <tr>
+              <td>Multi-agent pipeline (orchestrator + 3 sub-agents)</td>
+              <td>Sonnet + Haiku mix</td>
+              <td class="td-mono">$0.35</td>
+              <td class="td-mono">$1.50</td>
+              <td class="td-mono">$150</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>What to Do When a Limit Is Hit</h2>
+
+      <p>A hard limit shouldn't just silently kill the agent. Your application needs to handle the budget exceeded state gracefully:</p>
+
+      <ol>
+        <li><strong>Return a safe error to the user.</strong> "I wasn't able to complete this task. Please try a simpler version of your request." is better than a crash.</li>
+        <li><strong>Log the partial work.</strong> The agent may have completed 80% of the task before hitting the limit. Save intermediate results so the work isn't entirely lost.</li>
+        <li><strong>Alert your team.</strong> A budget hit is a signal that either the task was genuinely complex, or something went wrong. A Slack or email alert via webhook is easy to add to the limit handler.</li>
+        <li><strong>Review the conversation.</strong> Check what the agent was doing before hitting the limit. Loops and confused states are usually obvious in the logs.</li>
+      </ol>
+
+      <hr>
+
+      <p><strong>Related reading:</strong> <a href="/blog/hidden-costs-ai-agents-production/">The hidden costs of running AI agents in production</a> · <a href="/blog/why-llm-costs-higher-than-expected/">Why your LLM costs are 10x higher than expected</a> · <a href="/blog/llm-api-cost-comparison/">GPT-4o vs Claude vs Gemini: which is cheapest?</a></p>
+
+      <div class="article-cta">
+        <h3>Hard spending limits, out of the box</h3>
+        <p>ClawCost enforces per-day and per-month hard caps at the proxy level — no code changes required in your agents. Works with any OpenAI-compatible API.</p>
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="btn-cta" target="_blank">Get ClawCost free →</a>
+        <a href="/faq/" class="btn-outline">Read the FAQ</a>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a href="/" class="footer-logo">
+        <div class="nav-logo-mark" style="width:22px;height:22px">
+          <svg width="11" height="11" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        ClawCost
+      </a>
+      <div class="footer-links">
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="footer-link" target="_blank">GitHub</a>
+        <a href="/blog/" class="footer-link">Blog</a>
+        <a href="/faq/" class="footer-link">FAQ</a>
+        <a href="/vs-helicone/" class="footer-link">vs Helicone</a>
+        <a href="/vs-langsmith/" class="footer-link">vs LangSmith</a>
+      </div>
+      <div class="footer-right">Built for the OpenClaw community</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

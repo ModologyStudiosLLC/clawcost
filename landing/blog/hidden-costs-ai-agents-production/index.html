@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Hidden Costs of Running AI Agents in Production — ClawCost</title>
+<meta name="description" content="Retries, error loops, growing conversation history, tool overhead, embeddings, and vision tokens — the costs that don't show up in your estimates but show up on your bill.">
+<link rel="canonical" href="https://getclawcost.com/blog/hidden-costs-ai-agents-production/">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<meta property="og:title" content="The Hidden Costs of Running AI Agents in Production">
+<meta property="og:description" content="Retries, error loops, tool overhead, embeddings, and vision tokens — the costs that don't show up in estimates but show up on your bill.">
+<meta property="og:image" content="https://getclawcost.com/og.png">
+<meta property="og:url" content="https://getclawcost.com/blog/hidden-costs-ai-agents-production/">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "The Hidden Costs of Running AI Agents in Production",
+  "description": "Retries, error loops, tool overhead, embeddings, and vision tokens — the costs that don't show up in estimates but show up on your bill.",
+  "datePublished": "2026-04-09",
+  "dateModified": "2026-04-09",
+  "author": { "@type": "Organization", "name": "ClawCost" },
+  "publisher": { "@type": "Organization", "name": "ClawCost", "url": "https://getclawcost.com" }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+:root { --bg: #07080c; --surface: #0d0f18; --surface2: #131822; --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12); --text: #eaedf5; --text2: #8891a8; --text3: #484d68; --brand: #e8961e; --brand2: #ffc04d; --green: #00d47e; --radius: 14px; --radius-sm: 8px; }
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+h1, h2, h3, h4 { font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif; }
+.bg-grid { position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px); background-size: 32px 32px; mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%); -webkit-mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%); }
+.container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--border); background: rgba(7,8,12,0.85); }
+.nav-inner { display: flex; align-items: center; gap: 32px; height: 60px; }
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: -0.02em; }
+.nav-logo-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--brand); display: grid; place-items: center; flex-shrink: 0; }
+.nav-links { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.nav-link { color: var(--text2); text-decoration: none; font-size: 14px; font-weight: 500; padding: 6px 12px; border-radius: var(--radius-sm); transition: color 0.15s, background 0.15s; }
+.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.nav-cta { background: var(--brand); color: #0a0a0e; font-weight: 600; font-size: 14px; padding: 8px 18px; border-radius: var(--radius-sm); text-decoration: none; transition: background 0.15s, box-shadow 0.15s, transform 0.15s; margin-left: 8px; }
+.nav-cta:hover { background: var(--brand2); box-shadow: 0 0 32px rgba(232,150,30,0.5); transform: translateY(-1px); }
+.article-wrap { position: relative; z-index: 1; padding-top: 100px; padding-bottom: 96px; }
+.article-header { max-width: 760px; margin: 0 auto 48px; }
+.article-breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text3); margin-bottom: 20px; }
+.article-breadcrumb a { color: var(--text2); text-decoration: none; } .article-breadcrumb a:hover { color: var(--brand); } .article-breadcrumb span { color: var(--text3); }
+.article-meta { display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--text2); margin-bottom: 24px; flex-wrap: wrap; }
+.article-tag { background: rgba(232,150,30,0.12); color: var(--brand); padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+h1.article-title { font-size: clamp(28px, 4vw, 46px); font-weight: 700; line-height: 1.15; letter-spacing: -0.03em; color: var(--text); margin-bottom: 20px; }
+.article-subtitle { font-size: 18px; color: var(--text2); line-height: 1.6; max-width: 680px; }
+.article-body { max-width: 760px; margin: 0 auto; }
+.article-body p { margin-bottom: 20px; font-size: 16px; line-height: 1.75; }
+.article-body h2 { font-size: 26px; font-weight: 700; letter-spacing: -0.025em; margin-top: 52px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+.article-body h3 { font-size: 19px; font-weight: 600; letter-spacing: -0.02em; margin-top: 36px; margin-bottom: 14px; }
+.article-body ul, .article-body ol { margin: 0 0 20px 20px; font-size: 16px; line-height: 1.75; }
+.article-body li { margin-bottom: 6px; }
+.article-body strong { font-weight: 600; }
+.article-body em { color: var(--text2); font-style: italic; }
+.article-body a { color: var(--brand); text-decoration: none; }
+.article-body a:hover { text-decoration: underline; }
+.article-body hr { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+.article-body code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--surface2); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; color: var(--brand2); }
+.table-wrap { overflow-x: auto; margin: 28px 0; border-radius: var(--radius); border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 480px; }
+thead tr { background: var(--surface2); border-bottom: 1px solid var(--border2); }
+thead th { padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text2); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.02); }
+tbody td { padding: 12px 16px; vertical-align: middle; }
+.td-mono { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text2); }
+.td-cost { font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--brand2); }
+.td-bad { color: #ff6b6b; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+.callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--brand); border-radius: var(--radius-sm); padding: 20px 24px; margin: 32px 0; }
+.callout p { margin: 0; font-size: 15px; }
+.callout-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brand); margin-bottom: 10px; }
+.callout-red { border-left-color: #ff6b6b; } .callout-red .callout-title { color: #ff6b6b; }
+.callout-green { border-left-color: var(--green); } .callout-green .callout-title { color: var(--green); }
+.hidden-cost { counter-increment: cost-item; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 28px; margin: 28px 0; }
+.hidden-cost-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+.hidden-cost-num { width: 36px; height: 36px; border-radius: 50%; background: rgba(232,150,30,0.15); border: 1px solid rgba(232,150,30,0.3); display: grid; place-items: center; font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: var(--brand); flex-shrink: 0; }
+.hidden-cost-title { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; }
+.hidden-cost p { font-size: 15px; color: var(--text2); margin-bottom: 12px; }
+.hidden-cost p:last-child { margin-bottom: 0; }
+.hidden-cost strong { color: var(--text); }
+.article-cta { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 40px; margin-top: 64px; text-align: center; }
+.article-cta h3 { font-size: 22px; font-weight: 700; margin-bottom: 12px; margin-top: 0; }
+.article-cta p { color: var(--text2); margin-bottom: 24px; font-size: 15px; }
+.btn-cta { display: inline-flex; align-items: center; gap: 8px; background: var(--brand); color: #0a0a0e; font-weight: 700; font-size: 15px; padding: 12px 28px; border-radius: var(--radius-sm); text-decoration: none; transition: background 0.15s, box-shadow 0.15s, transform 0.15s; }
+.btn-cta:hover { background: var(--brand2); box-shadow: 0 0 32px rgba(232,150,30,0.4); transform: translateY(-1px); text-decoration: none; }
+.btn-outline { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: var(--text2); font-weight: 500; font-size: 15px; padding: 12px 28px; border-radius: var(--radius-sm); text-decoration: none; border: 1px solid var(--border2); transition: border-color 0.15s, color 0.15s; margin-left: 12px; }
+.btn-outline:hover { border-color: var(--brand); color: var(--brand); text-decoration: none; }
+footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 32px 0; }
+.footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.footer-logo { display: flex; align-items: center; gap: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 15px; color: var(--text); text-decoration: none; letter-spacing: -0.02em; }
+.footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+.footer-link { color: var(--text3); text-decoration: none; font-size: 13px; transition: color 0.15s; }
+.footer-link:hover { color: var(--text2); }
+.footer-right { color: var(--text3); font-size: 13px; }
+@media (max-width: 640px) { .nav-links a:not(.nav-cta) { display: none; } .article-wrap { padding-top: 84px; } .article-body h2 { font-size: 22px; } }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<nav>
+  <div class="container nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-mark"><svg width="14" height="14" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      ClawCost
+    </a>
+    <div class="nav-links">
+      <a href="/#features" class="nav-link">Features</a>
+      <a href="/#pricing" class="nav-link">Pricing</a>
+      <a href="/blog/" class="nav-link" style="color:var(--brand)">Blog</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-link" target="_blank">GitHub</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-cta" target="_blank">Get started →</a>
+    </div>
+  </div>
+</nav>
+
+<main class="article-wrap">
+  <div class="container">
+    <div class="article-header">
+      <div class="article-breadcrumb">
+        <a href="/">ClawCost</a><span>›</span>
+        <a href="/blog/">Blog</a><span>›</span>
+        <span>Hidden Costs of AI Agents</span>
+      </div>
+      <div class="article-meta">
+        <span class="article-tag">Agents</span>
+        <span>April 2026</span>
+        <span>·</span>
+        <span>11 min read</span>
+      </div>
+      <h1 class="article-title">The Hidden Costs of Running AI Agents in Production</h1>
+      <p class="article-subtitle">Your cost estimate was based on what you could see: tokens in, tokens out. But production agents have seven additional cost sources that never appear in a prototype — and together they're often larger than the base token cost.</p>
+    </div>
+
+    <div class="article-body">
+
+      <p>When developers estimate the cost of an AI agent, they typically model the happy path: a clean task, a few turns, straightforward tool calls. That model misses most of what actually drives production costs.</p>
+
+      <p>Here are the seven hidden cost sources, with real numbers for each.</p>
+
+      <div class="hidden-cost">
+        <div class="hidden-cost-header">
+          <div class="hidden-cost-num">1</div>
+          <div class="hidden-cost-title">Tool Call System Prompt Overhead</div>
+        </div>
+        <p>Every API call that includes tool definitions adds a <strong>hidden system prompt</strong> that explains to the model how tool use works. Anthropic's pricing documentation is explicit: using tools with <code>tool_choice: auto</code> or <code>none</code> adds <strong>346 tokens</strong> to the system prompt. Using <code>any</code> or a specific tool adds <strong>313 tokens</strong>.</p>
+        <p>That's before your actual tool definitions. A tool with a name, description, and a JSON schema for its parameters typically runs 100–400 tokens per tool. Define 5 tools and you're adding 500–2,000 tokens to every single call — including calls where the model doesn't use any tool.</p>
+        <p><strong>Example:</strong> 10 tools × 200 tokens each + 346 overhead = 2,346 extra input tokens per call. At Claude Sonnet 4.6 ($3/MTok), that's $0.007 per call in pure overhead. At 50,000 calls/month: <strong>$350/month in invisible input costs</strong>.</p>
+        <p><strong>Fix:</strong> Pass only the tools needed for the current step. In a multi-stage pipeline, provide a subset of tools per stage. Remove tools when the current step doesn't require tool use at all.</p>
+      </div>
+
+      <div class="hidden-cost">
+        <div class="hidden-cost-header">
+          <div class="hidden-cost-num">2</div>
+          <div class="hidden-cost-title">Retry Costs on Failed Tool Calls</div>
+        </div>
+        <p>When a tool call fails — network timeout, external API rate limit, malformed response — most agent frameworks retry the entire LLM call with an error message appended to the context. Each retry is billed at the same rate as a successful call, plus it grows the context for future turns.</p>
+        <p>A retry on turn 8 of a conversation with 12,000 tokens of accumulated context costs the same as the original turn 8 call. If your external tool has a 5% error rate and you allow 3 retries, that's 15% of your calls generating up to 3x the expected cost for that turn.</p>
+        <p><strong>Example:</strong> Turn 8 context is 12,000 tokens in, 800 tokens out. Cost: $0.048. With 3 retries on failures (5% rate across 10,000 daily calls = 500 failures), that's 1,500 extra calls × $0.048 = <strong>$72/day in retry costs</strong> — roughly $2,160/month.</p>
+        <p><strong>Fix:</strong> Handle tool errors at the tool wrapper layer, not the LLM layer. Return a structured error object to the model on first failure, not a full retry. Only escalate to a new LLM call if the error genuinely requires the model to decide what to do next. Set a maximum retry count and break the loop.</p>
+      </div>
+
+      <div class="hidden-cost">
+        <div class="hidden-cost-header">
+          <div class="hidden-cost-num">3</div>
+          <div class="hidden-cost-title">Growing Conversation History</div>
+        </div>
+        <p>In multi-turn agents, the full conversation history is sent on every call. This means the cost of turn N includes all tokens from turns 1 through N-1. For a 15-turn conversation where each turn adds 800 tokens, by turn 15 you're sending roughly 12,000 tokens of history on what started as a 500-token request.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Turn</th><th>New content</th><th>Total context</th><th>Input cost (Sonnet 4.6)</th><th>Cumulative cost</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td class="td-mono">1,200 tok</td><td class="td-mono">1,200</td><td class="td-mono">$0.0036</td><td class="td-mono">$0.0036</td></tr>
+              <tr><td>5</td><td class="td-mono">800 tok</td><td class="td-mono">4,400</td><td class="td-mono">$0.0132</td><td class="td-mono">$0.039</td></tr>
+              <tr><td>10</td><td class="td-mono">800 tok</td><td class="td-mono">8,400</td><td class="td-mono">$0.0252</td><td class="td-mono">$0.113</td></tr>
+              <tr><td>15</td><td class="td-mono">800 tok</td><td class="td-mono">12,400</td><td class="td-mono">$0.0372</td><td class="td-mono">$0.228</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>A 15-turn conversation costs $0.228 just in input tokens at Sonnet 4.6 rates — before a single output token is counted. If you estimated $0.015/turn × 15 turns = $0.225, you got lucky in this case. But once output tokens are added (especially if the agent is verbose), real cost is 2–3x the estimate.</p>
+        <p><strong>Fix:</strong> Use prompt caching on the stable portions (system prompt, early conversation) and implement conversation summarization to compress older turns. See <a href="/blog/prompt-caching-saves-money/">our post on prompt caching</a> for the exact math.</p>
+      </div>
+
+      <div class="hidden-cost">
+        <div class="hidden-cost-header">
+          <div class="hidden-cost-num">4</div>
+          <div class="hidden-cost-title">Tool Result Tokens</div>
+        </div>
+        <p>When a tool returns data, that data becomes input tokens on the next call. A web search that returns 3 results at 500 words each adds roughly 2,000 tokens to your context. A database query that returns a JSON payload of 50 rows adds 3,000–8,000 tokens.</p>
+        <p>These tokens are invisible in most cost estimates because they're not part of your original prompt — they come from tool execution. But you pay for them at the full input rate.</p>
+        <p><strong>Example:</strong> An agent calls a search tool 4 times per task, each returning ~1,500 tokens of results. That's 6,000 additional input tokens per task. At Claude Sonnet 4.6: $0.018 per task. At 10,000 tasks/month: <strong>$180/month in tool result tokens</strong> alone.</p>
+        <p><strong>Fix:</strong> Truncate or summarize tool results before passing them to the model. A search result doesn't need to include the full article body — a 200-token excerpt and URL is usually sufficient. A database result doesn't need all 50 rows — return only the relevant ones. Use a lightweight model to summarize tool results before passing to the main agent model.</p>
+      </div>
+
+      <div class="hidden-cost">
+        <div class="hidden-cost-header">
+          <div class="hidden-cost-num">5</div>
+          <div class="hidden-cost-title">Embedding Costs</div>
+        </div>
+        <p>RAG pipelines generate embeddings for every document chunk at index time, and for every user query at search time. These are billed separately from completion tokens. OpenAI's <code>text-embedding-3-large</code> costs $0.13/MTok. Smaller models are cheaper but may reduce retrieval quality.</p>
+        <p>For a knowledge base of 100,000 document chunks averaging 500 tokens each: 100,000 × 500 = 50 million tokens to embed. At $0.13/MTok: <strong>$6.50 one-time indexing cost</strong>. Not huge, but each re-index (new documents, updated content) incurs it again.</p>
+        <p>More importantly, every user query generates an embedding. At 50,000 queries/day with 50-token average queries: 2.5 million tokens/day × $0.13/MTok = <strong>$0.33/day, $10/month</strong>. Easy to overlook in the primary model cost analysis.</p>
+        <p><strong>Fix:</strong> Cache embeddings for common queries. Use a smaller embedding model if retrieval quality holds up. Batch your re-indexing operations using the Batch API (50% discount where available).</p>
+      </div>
+
+      <div class="hidden-cost">
+        <div class="hidden-cost-header">
+          <div class="hidden-cost-num">6</div>
+          <div class="hidden-cost-title">Vision and Multimodal Tokens</div>
+        </div>
+        <p>Images are tokenized at a rate that depends on image dimensions and the provider's tiling approach. Anthropic counts image tokens based on image size: a 1080×1080 image uses approximately 1,334 tokens (as a high-resolution image). A full-page PDF screenshot at 2x resolution can consume 4,000–6,000 tokens per page.</p>
+        <p>If your agent processes documents by screenshotting pages and passing them to a vision model, a 10-page document could cost $0.03–$0.09 in input tokens just for the images — before any text tokens from the prompt or OCR results. At scale this adds up fast.</p>
+        <p><strong>Fix:</strong> Use text extraction (PDF parsing, OCR) instead of vision where possible — text tokens are much cheaper than image tokens. Reserve vision models for cases where the visual layout genuinely matters (charts, forms, diagrams).</p>
+      </div>
+
+      <div class="hidden-cost">
+        <div class="hidden-cost-header">
+          <div class="hidden-cost-num">7</div>
+          <div class="hidden-cost-title">Sub-agent Spawning</div>
+        </div>
+        <p>Multi-agent architectures — where an orchestrator spawns specialist sub-agents to handle parts of a task — multiply your cost by the number of agents running in parallel. If an orchestrator spawns 3 sub-agents, each with their own tool calls and conversation history, the total cost is the sum of all four agents' API calls, not just the orchestrator's.</p>
+        <p>This is often intentional and correct. But it means cost estimation requires modeling the entire call tree, not just the top-level agent. An orchestrator that makes 2 calls but spawns 3 sub-agents each making 8 calls has a true call count of 26, not 2.</p>
+        <p><strong>Fix:</strong> Set per-agent token budgets and enforce them at the proxy level. Monitor cost per sub-agent type separately so you can see which specialist is driving spend. Consider whether parallel sub-agents are necessary — sequential execution is cheaper when latency requirements allow it.</p>
+      </div>
+
+      <h2>What Your Production Cost Actually Looks Like</h2>
+
+      <p>Combining these factors, here's what a typical production agent might actually cost vs. what was estimated:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Cost component</th><th>Estimated</th><th>Actual (production)</th></tr></thead>
+          <tbody>
+            <tr><td>Base LLM tokens (prompt + response)</td><td class="td-cost">$0.05</td><td class="td-cost">$0.05</td></tr>
+            <tr><td>Tool system prompt overhead</td><td class="td-mono">$0.00</td><td class="td-bad">$0.007</td></tr>
+            <tr><td>Growing context (turns 1–10 avg)</td><td class="td-mono">$0.05</td><td class="td-bad">$0.09</td></tr>
+            <tr><td>Tool result tokens</td><td class="td-mono">$0.00</td><td class="td-bad">$0.018</td></tr>
+            <tr><td>Retries (5% error rate × 3 retries)</td><td class="td-mono">$0.00</td><td class="td-bad">$0.007</td></tr>
+            <tr><td><strong>Total per task</strong></td><td class="td-cost">$0.10</td><td class="td-bad">$0.172</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The example above is 1.7x the estimate. With more tools, longer conversations, or sub-agents, it's easy to reach 3–5x. At 10,000 tasks/month, the difference between $0.10 and $0.50 is the difference between a $1,000 bill and a $5,000 bill.</p>
+
+      <div class="callout callout-green">
+        <div class="callout-title">Visibility is the first step</div>
+        <p>None of these cost sources are visible in the provider's dashboard, which shows you totals but not per-call breakdowns by component. <a href="https://github.com/ModologyStudiosLLC/clawcost">ClawCost</a> logs every token on every call through the proxy, so you can see exactly which calls, which models, and which endpoints are driving your bill — and set hard limits before an unexpected cost source compounds into a real problem.</p>
+      </div>
+
+      <hr>
+
+      <p><strong>Related reading:</strong> <a href="/blog/ai-agent-spending-limits/">How to set hard spending limits on AI agents</a> · <a href="/blog/why-llm-costs-higher-than-expected/">Why your LLM costs are 10x higher than expected</a> · <a href="/blog/prompt-caching-saves-money/">Does prompt caching actually save money?</a></p>
+
+      <div class="article-cta">
+        <h3>See every hidden token on every call</h3>
+        <p>ClawCost proxies your API calls, logs complete token breakdowns per request, and enforces hard daily and monthly spending caps. Works with Claude, OpenAI, Gemini, and any OpenAI-compatible endpoint.</p>
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="btn-cta" target="_blank">Get ClawCost free →</a>
+        <a href="/faq/" class="btn-outline">Read the FAQ</a>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a href="/" class="footer-logo">
+        <div class="nav-logo-mark" style="width:22px;height:22px"><svg width="11" height="11" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        ClawCost
+      </a>
+      <div class="footer-links">
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="footer-link" target="_blank">GitHub</a>
+        <a href="/blog/" class="footer-link">Blog</a>
+        <a href="/faq/" class="footer-link">FAQ</a>
+        <a href="/vs-helicone/" class="footer-link">vs Helicone</a>
+        <a href="/vs-langsmith/" class="footer-link">vs LangSmith</a>
+      </div>
+      <div class="footer-right">Built for the OpenClaw community</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

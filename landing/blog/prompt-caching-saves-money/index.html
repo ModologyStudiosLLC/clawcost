@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Caching: Does It Actually Save Money? (We Ran the Numbers) — ClawCost</title>
+<meta name="description" content="Anthropic charges 1.25x to write to cache and 0.1x to read from it. We break down exactly when prompt caching saves money, when it doesn't, and the real break-even calculation for your workload.">
+<link rel="canonical" href="https://getclawcost.com/blog/prompt-caching-saves-money/">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<meta property="og:title" content="Prompt Caching: Does It Actually Save Money? (We Ran the Numbers)">
+<meta property="og:description" content="Anthropic charges 1.25x to write to cache and 0.1x to read from it. Here's the exact break-even calculation for your workload.">
+<meta property="og:image" content="https://getclawcost.com/og.png">
+<meta property="og:url" content="https://getclawcost.com/blog/prompt-caching-saves-money/">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Prompt Caching: Does It Actually Save Money?",
+  "description": "Anthropic charges 1.25x to write to cache and 0.1x to read from it. We break down exactly when prompt caching saves money and the real break-even calculation.",
+  "datePublished": "2026-04-09",
+  "dateModified": "2026-04-09",
+  "author": { "@type": "Organization", "name": "ClawCost" },
+  "publisher": { "@type": "Organization", "name": "ClawCost", "url": "https://getclawcost.com" }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+:root { --bg: #07080c; --surface: #0d0f18; --surface2: #131822; --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12); --text: #eaedf5; --text2: #8891a8; --text3: #484d68; --brand: #e8961e; --brand2: #ffc04d; --green: #00d47e; --radius: 14px; --radius-sm: 8px; }
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+h1, h2, h3, h4 { font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif; }
+.bg-grid { position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px); background-size: 32px 32px; mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%); -webkit-mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%); }
+.container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--border); background: rgba(7,8,12,0.85); }
+.nav-inner { display: flex; align-items: center; gap: 32px; height: 60px; }
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: -0.02em; }
+.nav-logo-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--brand); display: grid; place-items: center; flex-shrink: 0; }
+.nav-links { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.nav-link { color: var(--text2); text-decoration: none; font-size: 14px; font-weight: 500; padding: 6px 12px; border-radius: var(--radius-sm); transition: color 0.15s, background 0.15s; }
+.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.nav-cta { background: var(--brand); color: #0a0a0e; font-weight: 600; font-size: 14px; padding: 8px 18px; border-radius: var(--radius-sm); text-decoration: none; transition: background 0.15s, box-shadow 0.15s, transform 0.15s; margin-left: 8px; }
+.nav-cta:hover { background: var(--brand2); box-shadow: 0 0 32px rgba(232,150,30,0.5); transform: translateY(-1px); }
+.article-wrap { position: relative; z-index: 1; padding-top: 100px; padding-bottom: 96px; }
+.article-header { max-width: 760px; margin: 0 auto 48px; }
+.article-breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text3); margin-bottom: 20px; }
+.article-breadcrumb a { color: var(--text2); text-decoration: none; } .article-breadcrumb a:hover { color: var(--brand); } .article-breadcrumb span { color: var(--text3); }
+.article-meta { display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--text2); margin-bottom: 24px; flex-wrap: wrap; }
+.article-tag { background: rgba(232,150,30,0.12); color: var(--brand); padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+h1.article-title { font-size: clamp(28px, 4vw, 46px); font-weight: 700; line-height: 1.15; letter-spacing: -0.03em; margin-bottom: 20px; }
+.article-subtitle { font-size: 18px; color: var(--text2); line-height: 1.6; max-width: 680px; }
+.article-body { max-width: 760px; margin: 0 auto; }
+.article-body p { margin-bottom: 20px; font-size: 16px; line-height: 1.75; }
+.article-body h2 { font-size: 26px; font-weight: 700; letter-spacing: -0.025em; margin-top: 52px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+.article-body h3 { font-size: 19px; font-weight: 600; letter-spacing: -0.02em; margin-top: 36px; margin-bottom: 14px; }
+.article-body ul, .article-body ol { margin: 0 0 20px 20px; font-size: 16px; line-height: 1.75; }
+.article-body li { margin-bottom: 6px; }
+.article-body strong { font-weight: 600; }
+.article-body em { color: var(--text2); font-style: italic; }
+.article-body a { color: var(--brand); text-decoration: none; }
+.article-body a:hover { text-decoration: underline; }
+.article-body hr { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+.article-body code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--surface2); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; color: var(--brand2); }
+.article-body pre { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px 24px; margin: 24px 0; overflow-x: auto; }
+.article-body pre code { background: none; border: none; padding: 0; font-size: 13px; color: var(--text2); line-height: 1.8; }
+.table-wrap { overflow-x: auto; margin: 28px 0; border-radius: var(--radius); border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 480px; }
+thead tr { background: var(--surface2); border-bottom: 1px solid var(--border2); }
+thead th { padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text2); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.02); }
+tbody td { padding: 12px 16px; vertical-align: middle; }
+.td-mono { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text2); }
+.td-cost { font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--brand2); }
+.td-save { color: var(--green); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+.td-bad { color: #ff6b6b; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+.callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--brand); border-radius: var(--radius-sm); padding: 20px 24px; margin: 32px 0; }
+.callout p { margin: 0; font-size: 15px; }
+.callout-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brand); margin-bottom: 10px; }
+.callout-green { border-left-color: var(--green); } .callout-green .callout-title { color: var(--green); }
+.callout-red { border-left-color: #ff6b6b; } .callout-red .callout-title { color: #ff6b6b; }
+.formula-box { background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 28px 32px; margin: 32px 0; text-align: center; }
+.formula-box .formula { font-family: 'JetBrains Mono', monospace; font-size: 16px; color: var(--brand2); margin: 16px 0; line-height: 1.8; }
+.formula-box .formula-label { font-size: 13px; color: var(--text3); }
+.article-cta { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 40px; margin-top: 64px; text-align: center; }
+.article-cta h3 { font-size: 22px; font-weight: 700; margin-bottom: 12px; margin-top: 0; }
+.article-cta p { color: var(--text2); margin-bottom: 24px; font-size: 15px; }
+.btn-cta { display: inline-flex; align-items: center; gap: 8px; background: var(--brand); color: #0a0a0e; font-weight: 700; font-size: 15px; padding: 12px 28px; border-radius: var(--radius-sm); text-decoration: none; transition: background 0.15s, box-shadow 0.15s, transform 0.15s; }
+.btn-cta:hover { background: var(--brand2); box-shadow: 0 0 32px rgba(232,150,30,0.4); transform: translateY(-1px); text-decoration: none; }
+.btn-outline { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: var(--text2); font-weight: 500; font-size: 15px; padding: 12px 28px; border-radius: var(--radius-sm); text-decoration: none; border: 1px solid var(--border2); transition: border-color 0.15s, color 0.15s; margin-left: 12px; }
+.btn-outline:hover { border-color: var(--brand); color: var(--brand); text-decoration: none; }
+footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 32px 0; }
+.footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.footer-logo { display: flex; align-items: center; gap: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 15px; color: var(--text); text-decoration: none; letter-spacing: -0.02em; }
+.footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+.footer-link { color: var(--text3); text-decoration: none; font-size: 13px; transition: color 0.15s; }
+.footer-link:hover { color: var(--text2); }
+.footer-right { color: var(--text3); font-size: 13px; }
+@media (max-width: 640px) { .nav-links a:not(.nav-cta) { display: none; } .article-wrap { padding-top: 84px; } .article-body h2 { font-size: 22px; } }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<nav>
+  <div class="container nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-mark"><svg width="14" height="14" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      ClawCost
+    </a>
+    <div class="nav-links">
+      <a href="/#features" class="nav-link">Features</a>
+      <a href="/#pricing" class="nav-link">Pricing</a>
+      <a href="/blog/" class="nav-link" style="color:var(--brand)">Blog</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-link" target="_blank">GitHub</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-cta" target="_blank">Get started →</a>
+    </div>
+  </div>
+</nav>
+
+<main class="article-wrap">
+  <div class="container">
+    <div class="article-header">
+      <div class="article-breadcrumb">
+        <a href="/">ClawCost</a><span>›</span>
+        <a href="/blog/">Blog</a><span>›</span>
+        <span>Prompt Caching</span>
+      </div>
+      <div class="article-meta">
+        <span class="article-tag">Cost Optimization</span>
+        <span>April 2026</span>
+        <span>·</span>
+        <span>8 min read</span>
+      </div>
+      <h1 class="article-title">Prompt Caching: Does It Actually Save Money?</h1>
+      <p class="article-subtitle">Anthropic charges a premium to write content to cache — and then charges only 10% of normal input price on reads. We ran the break-even math on common workloads so you know exactly when caching helps, when it doesn't, and how much you can actually save.</p>
+    </div>
+
+    <div class="article-body">
+
+      <p>Prompt caching sounds like an obvious win: store your system prompt once, read it cheaply forever. But the pricing model is more nuanced than that — you pay a write premium, and the benefit only materializes if the cache is hit enough times before it expires. Whether caching saves money depends entirely on your request volume and cache hit rate.</p>
+
+      <h2>How Anthropic's Prompt Caching Pricing Works</h2>
+
+      <p>Anthropic offers two cache durations, each with different write costs and the same read cost:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Operation</th><th>Price multiplier</th><th>Effective price (Sonnet 4.6)</th><th>Cache duration</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Standard input (no cache)</td>
+              <td class="td-mono">1.0x</td>
+              <td class="td-cost">$3.00 / MTok</td>
+              <td class="td-mono">—</td>
+            </tr>
+            <tr>
+              <td>Cache write (5-minute TTL)</td>
+              <td class="td-mono">1.25x</td>
+              <td class="td-cost">$3.75 / MTok</td>
+              <td class="td-mono">5 minutes</td>
+            </tr>
+            <tr>
+              <td>Cache write (1-hour TTL)</td>
+              <td class="td-mono">2.0x</td>
+              <td class="td-cost">$6.00 / MTok</td>
+              <td class="td-mono">1 hour</td>
+            </tr>
+            <tr>
+              <td>Cache read (hit)</td>
+              <td class="td-mono">0.1x</td>
+              <td class="td-save">$0.30 / MTok</td>
+              <td class="td-mono">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The minimum cacheable block is <strong>1,024 tokens</strong>. If your system prompt is under 1,024 tokens, you can't cache it at all — you have to pad it or accept standard pricing.</p>
+
+      <p>Prompt caching is available on Claude Sonnet 4.6, Claude Opus 4.6, Claude Haiku 4.5, and other current Claude models. The same multipliers apply regardless of model — only the base price changes.</p>
+
+      <h2>The Break-Even Calculation</h2>
+
+      <p>For caching to save money, the total cost of (1 write + N reads) must be less than the cost of (N+1 standard reads).</p>
+
+      <div class="formula-box">
+        <div class="formula-label">5-minute cache break-even</div>
+        <div class="formula">1.25x write + N × 0.1x read &lt; (N + 1) × 1.0x standard</div>
+        <div class="formula-label">Solving for N: break-even at N = 1 read</div>
+      </div>
+
+      <p>For the 5-minute TTL cache, you break even after just <strong>one cache read</strong>. The write costs 1.25 units; one read costs 0.10 units; total: 1.35 units. Without caching, two standard calls cost 2.0 units. You're already ahead by the second request.</p>
+
+      <div class="formula-box">
+        <div class="formula-label">1-hour cache break-even</div>
+        <div class="formula">2.0x write + N × 0.1x read &lt; (N + 1) × 1.0x standard</div>
+        <div class="formula-label">Solving for N: break-even at N = 2 reads</div>
+      </div>
+
+      <p>For the 1-hour TTL, you need <strong>two cache reads</strong> within an hour to break even. Write costs 2.0; two reads cost 0.20; total: 2.20 units. Without caching, three standard calls cost 3.0 units. You're ahead starting with the third request.</p>
+
+      <h2>Real-World Savings Scenarios</h2>
+
+      <h3>Scenario 1: System Prompt in a Chatbot (High Volume)</h3>
+
+      <p>Setup: 2,000-token system prompt, 1,000 users per day, 5 turns per user average. All turns share the same system prompt.</p>
+
+      <ul>
+        <li>Without caching: 5,000 calls × 2,000 tokens = 10M input tokens/day at $3/MTok = <strong>$30/day</strong></li>
+        <li>With 5-min caching (assuming 1 write + 4 reads per session, 1,000 sessions): 1,000 writes × 2,000 × $3.75/MTok + 4,000 reads × 2,000 × $0.30/MTok = $7.50 + $2.40 = <strong>$9.90/day</strong></li>
+        <li><strong>Savings: $20.10/day ($603/month)</strong> — 67% reduction on system prompt costs alone</li>
+      </ul>
+
+      <h3>Scenario 2: Large Document Analysis (Sporadic Requests)</h3>
+
+      <p>Setup: 50,000-token document, users analyze it 3 times over a 30-minute window, then it's done.</p>
+
+      <ul>
+        <li>Without caching: 3 calls × 50,000 tokens = 150,000 input tokens × $3/MTok = <strong>$0.45</strong></li>
+        <li>With 5-min caching: 1 write × 50,000 × $3.75/MTok + 2 reads × 50,000 × $0.30/MTok = $0.1875 + $0.03 = <strong>$0.2175</strong></li>
+        <li><strong>Savings: $0.2325 per document — 52% reduction</strong></li>
+      </ul>
+
+      <h3>Scenario 3: System Prompt in a Low-Volume Internal Tool</h3>
+
+      <p>Setup: 2,000-token system prompt, 20 calls per day with gaps of 30+ minutes between calls.</p>
+
+      <ul>
+        <li>Without caching: 20 calls × 2,000 tokens × $3/MTok = <strong>$0.12/day</strong></li>
+        <li>With 5-min caching (cache expires between most calls, so many writes): 15 writes × 2,000 × $3.75/MTok + 5 reads × 2,000 × $0.30/MTok = $0.1125 + $0.003 = <strong>$0.1155/day</strong></li>
+        <li><strong>Savings: $0.0045/day — not worth the implementation complexity</strong></li>
+      </ul>
+
+      <p>The third scenario is the important one: caching only helps when there are multiple requests within the TTL window. For low-volume or infrequent workloads, you might actually pay <em>more</em> if you use the 1-hour TTL on a cache that never gets read.</p>
+
+      <h2>When Prompt Caching Backfires</h2>
+
+      <div class="callout callout-red">
+        <div class="callout-title">The 1-hour TTL trap</div>
+        <p>If you set a 1-hour cache on a 5,000-token document and only receive 1 request for it in that hour, you've paid 2.0x for the write and 0x for reads — costing you double the standard price. The longer TTL only makes sense for content that's accessed frequently within its window. For sporadic document analysis, the 5-minute TTL is almost always better: the write premium is lower, and you still capture multi-turn conversations.</p>
+      </div>
+
+      <h2>How to Implement It in Practice</h2>
+
+      <p>Anthropic supports two caching modes:</p>
+
+      <h3>Automatic caching (recommended)</h3>
+      <p>Add a single top-level <code>cache_control</code> flag and Anthropic manages breakpoints automatically as the conversation grows:</p>
+
+      <pre><code>{
+  "model": "claude-sonnet-4-6",
+  "cache_control": {"type": "ephemeral"},
+  "system": "Your system prompt here...",
+  "messages": [...]
+}</code></pre>
+
+      <h3>Explicit cache breakpoints (fine-grained control)</h3>
+      <p>Place <code>cache_control</code> on specific content blocks when you want precise control — for example, caching a large document separately from the system prompt:</p>
+
+      <pre><code>{
+  "model": "claude-sonnet-4-6",
+  "system": [
+    {
+      "type": "text",
+      "text": "Your system prompt...",
+      "cache_control": {"type": "ephemeral"}
+    }
+  ],
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "Here is the document to analyze:\n\n[50,000 token document]",
+          "cache_control": {"type": "ephemeral"}
+        },
+        {
+          "type": "text",
+          "text": "What are the key findings?"
+        }
+      ]
+    }
+  ]
+}</code></pre>
+
+      <p>On subsequent turns in the same conversation, the system prompt and document are read from cache at 0.1x cost. Only the new user message and conversation extension are billed at full input price.</p>
+
+      <h2>Stacking Caching with Batch API</h2>
+
+      <p>Anthropic allows prompt caching and the Batch API discount to stack. If you're running batch jobs with repeated system prompts or documents:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Scenario</th><th>Input cost (Sonnet 4.6)</th><th>Effective rate</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Standard (no caching, no batch)</td><td class="td-cost">$3.00 / MTok</td><td class="td-mono">baseline</td></tr>
+            <tr><td>Batch API only</td><td class="td-save">$1.50 / MTok</td><td class="td-save">50% off</td></tr>
+            <tr><td>Cache reads only</td><td class="td-save">$0.30 / MTok</td><td class="td-save">90% off</td></tr>
+            <tr><td>Cache reads + Batch API</td><td class="td-save">$0.15 / MTok</td><td class="td-save">95% off</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>For a large-scale document processing pipeline that repeats the same system prompt across thousands of documents sent as a batch job, the stacked discount brings your effective input cost to <strong>$0.15/MTok</strong> — 20x cheaper than standard pricing.</p>
+
+      <h2>Should You Use Prompt Caching?</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Your situation</th><th>Recommendation</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>System prompt &gt; 1,024 tokens + multiple users</td><td class="td-save">Yes — implement immediately</td></tr>
+            <tr><td>Multi-turn chatbot with stable system prompt</td><td class="td-save">Yes — high ROI</td></tr>
+            <tr><td>Document analysis with repeat queries</td><td class="td-save">Yes, use 5-min TTL</td></tr>
+            <tr><td>RAG with large, repeated context chunks</td><td class="td-save">Yes — cache the static context</td></tr>
+            <tr><td>System prompt &lt; 1,024 tokens</td><td class="td-bad">No — below minimum</td></tr>
+            <tr><td>Single-turn, no repeated context</td><td class="td-bad">No — nothing to cache</td></tr>
+            <tr><td>&lt; 2 requests per hour for same content</td><td class="td-bad">No — write premium not recovered</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-green">
+        <div class="callout-title">Track your cache hit rate</div>
+        <p>Anthropic's API response includes <code>cache_read_input_tokens</code> and <code>cache_creation_input_tokens</code> in the usage object. Monitoring these is the only way to confirm caching is working and measure actual savings vs. expected savings. <a href="https://github.com/ModologyStudiosLLC/clawcost">ClawCost</a> tracks these fields per request in its proxy logs, so you can see your real cache hit rate alongside total cost — and quickly identify if a cache is expiring too early or not being populated as expected.</p>
+      </div>
+
+      <hr>
+
+      <p><strong>Related reading:</strong> <a href="/blog/why-llm-costs-higher-than-expected/">Why your LLM costs are 10x higher than expected</a> · <a href="/blog/llm-api-cost-comparison/">GPT-4o vs Claude vs Gemini: which is cheapest?</a> · <a href="/blog/hidden-costs-ai-agents-production/">The hidden costs of running AI agents in production</a></p>
+
+      <div class="article-cta">
+        <h3>Track cache hit rates and real costs together</h3>
+        <p>ClawCost logs <code>cache_read_input_tokens</code> on every call, so you can see your actual caching ROI in real time — and set hard spending caps alongside it.</p>
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="btn-cta" target="_blank">Get ClawCost free →</a>
+        <a href="/faq/" class="btn-outline">Read the FAQ</a>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a href="/" class="footer-logo">
+        <div class="nav-logo-mark" style="width:22px;height:22px"><svg width="11" height="11" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        ClawCost
+      </a>
+      <div class="footer-links">
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="footer-link" target="_blank">GitHub</a>
+        <a href="/blog/" class="footer-link">Blog</a>
+        <a href="/faq/" class="footer-link">FAQ</a>
+        <a href="/vs-helicone/" class="footer-link">vs Helicone</a>
+        <a href="/vs-langsmith/" class="footer-link">vs LangSmith</a>
+      </div>
+      <div class="footer-right">Built for the OpenClaw community</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

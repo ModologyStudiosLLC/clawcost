@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPT-4o vs Claude vs Gemini: Which LLM API is Cheapest? (2026) — ClawCost</title>
+<meta name="description" content="Real per-token pricing compared across GPT-4o, Claude Sonnet, Gemini 2.5 Pro, and more. We run the numbers for RAG, summarization, agents, and coding workloads so you can pick the right model for your budget.">
+<link rel="canonical" href="https://getclawcost.com/blog/llm-api-cost-comparison/">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<meta property="og:title" content="GPT-4o vs Claude vs Gemini: Which LLM API is Cheapest? (2026)">
+<meta property="og:description" content="Real per-token pricing compared across GPT-4o, Claude Sonnet, Gemini 2.5 Pro, and more for common developer workloads.">
+<meta property="og:image" content="https://getclawcost.com/og.png">
+<meta property="og:url" content="https://getclawcost.com/blog/llm-api-cost-comparison/">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GPT-4o vs Claude vs Gemini: Which LLM API is Cheapest? (2026)">
+<meta name="twitter:description" content="Real per-token pricing compared across GPT-4o, Claude Sonnet, Gemini 2.5 Pro for RAG, summarization, agents, and coding.">
+<meta name="twitter:image" content="https://getclawcost.com/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "GPT-4o vs Claude vs Gemini: Which LLM API is Cheapest? (2026)",
+  "description": "Real per-token pricing compared across GPT-4o, Claude Sonnet, Gemini 2.5 Pro, and more for common developer workloads.",
+  "datePublished": "2026-04-09",
+  "dateModified": "2026-04-09",
+  "author": { "@type": "Organization", "name": "ClawCost" },
+  "publisher": { "@type": "Organization", "name": "ClawCost", "url": "https://getclawcost.com" }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+:root {
+  --bg: #07080c; --surface: #0d0f18; --surface2: #131822;
+  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+  --text: #eaedf5; --text2: #8891a8; --text3: #484d68;
+  --brand: #e8961e; --brand2: #ffc04d; --green: #00d47e;
+  --radius: 14px; --radius-sm: 8px;
+}
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+h1, h2, h3, h4 { font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif; }
+.bg-grid { position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px); background-size: 32px 32px; mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%); -webkit-mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%); }
+.container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--border); background: rgba(7,8,12,0.85); }
+.nav-inner { display: flex; align-items: center; gap: 32px; height: 60px; }
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: -0.02em; }
+.nav-logo-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--brand); display: grid; place-items: center; flex-shrink: 0; }
+.nav-links { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.nav-link { color: var(--text2); text-decoration: none; font-size: 14px; font-weight: 500; padding: 6px 12px; border-radius: var(--radius-sm); transition: color 0.15s, background 0.15s; }
+.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.nav-cta { background: var(--brand); color: #0a0a0e; font-weight: 600; font-size: 14px; padding: 8px 18px; border-radius: var(--radius-sm); text-decoration: none; transition: background 0.15s, box-shadow 0.15s, transform 0.15s; margin-left: 8px; }
+.nav-cta:hover { background: var(--brand2); box-shadow: 0 0 32px rgba(232,150,30,0.5); transform: translateY(-1px); }
+.article-wrap { position: relative; z-index: 1; padding-top: 100px; padding-bottom: 96px; }
+.article-header { max-width: 760px; margin: 0 auto 48px; }
+.article-breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text3); margin-bottom: 20px; }
+.article-breadcrumb a { color: var(--text2); text-decoration: none; }
+.article-breadcrumb a:hover { color: var(--brand); }
+.article-breadcrumb span { color: var(--text3); }
+.article-meta { display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--text2); margin-bottom: 24px; flex-wrap: wrap; }
+.article-tag { background: rgba(232,150,30,0.12); color: var(--brand); padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+h1.article-title { font-size: clamp(28px, 4vw, 46px); font-weight: 700; line-height: 1.15; letter-spacing: -0.03em; color: var(--text); margin-bottom: 20px; }
+.article-subtitle { font-size: 18px; color: var(--text2); line-height: 1.6; max-width: 680px; }
+.article-body { max-width: 760px; margin: 0 auto; }
+.article-body p { margin-bottom: 20px; color: var(--text); font-size: 16px; line-height: 1.75; }
+.article-body h2 { font-size: 26px; font-weight: 700; letter-spacing: -0.025em; margin-top: 52px; margin-bottom: 20px; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+.article-body h3 { font-size: 19px; font-weight: 600; letter-spacing: -0.02em; margin-top: 36px; margin-bottom: 14px; color: var(--text); }
+.article-body h4 { font-size: 12px; font-weight: 600; margin-top: 28px; margin-bottom: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; }
+.article-body ul, .article-body ol { margin: 0 0 20px 20px; color: var(--text); font-size: 16px; line-height: 1.75; }
+.article-body li { margin-bottom: 6px; }
+.article-body strong { color: var(--text); font-weight: 600; }
+.article-body em { color: var(--text2); font-style: italic; }
+.article-body a { color: var(--brand); text-decoration: none; }
+.article-body a:hover { text-decoration: underline; }
+.article-body hr { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+.article-body blockquote { border-left: 3px solid var(--brand); padding: 4px 20px; margin: 24px 0; color: var(--text2); font-style: italic; }
+.article-body code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--surface2); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; color: var(--brand2); }
+.table-wrap { overflow-x: auto; margin: 28px 0; border-radius: var(--radius); border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 480px; }
+thead tr { background: var(--surface2); border-bottom: 1px solid var(--border2); }
+thead th { padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text2); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.02); }
+tbody td { padding: 12px 16px; color: var(--text); vertical-align: middle; }
+.td-model { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text2); }
+.td-price { font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--brand2); }
+.td-cheap { color: var(--green); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+.td-exp { color: #ff6b6b; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+.td-context { color: var(--text3); font-size: 13px; }
+.callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--brand); border-radius: var(--radius-sm); padding: 20px 24px; margin: 32px 0; }
+.callout p { margin: 0; font-size: 15px; }
+.callout-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brand); margin-bottom: 10px; }
+.callout-green { border-left-color: var(--green); }
+.callout-green .callout-title { color: var(--green); }
+.article-cta { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 40px; margin-top: 64px; text-align: center; }
+.article-cta h3 { font-size: 22px; font-weight: 700; margin-bottom: 12px; margin-top: 0; }
+.article-cta p { color: var(--text2); margin-bottom: 24px; font-size: 15px; }
+.btn-cta { display: inline-flex; align-items: center; gap: 8px; background: var(--brand); color: #0a0a0e; font-weight: 700; font-size: 15px; padding: 12px 28px; border-radius: var(--radius-sm); text-decoration: none; transition: background 0.15s, box-shadow 0.15s, transform 0.15s; }
+.btn-cta:hover { background: var(--brand2); box-shadow: 0 0 32px rgba(232,150,30,0.4); transform: translateY(-1px); text-decoration: none; }
+.btn-outline { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: var(--text2); font-weight: 500; font-size: 15px; padding: 12px 28px; border-radius: var(--radius-sm); text-decoration: none; border: 1px solid var(--border2); transition: border-color 0.15s, color 0.15s; margin-left: 12px; }
+.btn-outline:hover { border-color: var(--brand); color: var(--brand); text-decoration: none; }
+footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 32px 0; }
+.footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.footer-logo { display: flex; align-items: center; gap: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 15px; color: var(--text); text-decoration: none; letter-spacing: -0.02em; }
+.footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+.footer-link { color: var(--text3); text-decoration: none; font-size: 13px; transition: color 0.15s; }
+.footer-link:hover { color: var(--text2); }
+.footer-right { color: var(--text3); font-size: 13px; }
+@media (max-width: 640px) { .nav-links a:not(.nav-cta) { display: none; } .article-wrap { padding-top: 84px; } .article-body h2 { font-size: 22px; } }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<nav>
+  <div class="container nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg width="14" height="14" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      ClawCost
+    </a>
+    <div class="nav-links">
+      <a href="/#features" class="nav-link">Features</a>
+      <a href="/#pricing" class="nav-link">Pricing</a>
+      <a href="/blog/" class="nav-link" style="color:var(--brand)">Blog</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-link" target="_blank">GitHub</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-cta" target="_blank">Get started →</a>
+    </div>
+  </div>
+</nav>
+
+<main class="article-wrap">
+  <div class="container">
+    <div class="article-header">
+      <div class="article-breadcrumb">
+        <a href="/">ClawCost</a>
+        <span>›</span>
+        <a href="/blog/">Blog</a>
+        <span>›</span>
+        <span>LLM API Cost Comparison</span>
+      </div>
+      <div class="article-meta">
+        <span class="article-tag">Comparison</span>
+        <span>April 2026</span>
+        <span>·</span>
+        <span>12 min read</span>
+      </div>
+      <h1 class="article-title">GPT-4o vs Claude vs Gemini: Which LLM API is Cheapest for Your Use Case?</h1>
+      <p class="article-subtitle">Headline pricing is almost meaningless. What matters is the cost per workload. We run the numbers across the leading models for RAG, summarization, agents, and coding — so you know what you're actually paying before the bill arrives.</p>
+    </div>
+
+    <div class="article-body">
+
+      <p>Every major provider publishes a pricing page. But a table of per-token rates tells you very little about what you'll actually spend in production. The real number depends on your input-to-output ratio, context window size, how many tool calls your agents make, whether you're using prompt caching, and which tier of model you actually need for your task.</p>
+
+      <p>This post runs the numbers on all of it. Pricing is sourced directly from provider documentation as of April 2026.</p>
+
+      <h2>Current Pricing at a Glance</h2>
+
+      <p>All prices are per million tokens (MTok). Output tokens are priced higher than input tokens at every provider — typically 4–5x more expensive.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Provider</th>
+              <th>Input ($/MTok)</th>
+              <th>Output ($/MTok)</th>
+              <th>Context</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>GPT-4o</strong></td>
+              <td>OpenAI</td>
+              <td class="td-price">$2.50</td>
+              <td class="td-price">$10.00</td>
+              <td class="td-context">128k</td>
+            </tr>
+            <tr>
+              <td><strong>GPT-4o mini</strong></td>
+              <td>OpenAI</td>
+              <td class="td-cheap">$0.15</td>
+              <td class="td-cheap">$0.60</td>
+              <td class="td-context">128k</td>
+            </tr>
+            <tr>
+              <td><strong>o1</strong></td>
+              <td>OpenAI</td>
+              <td class="td-exp">$15.00</td>
+              <td class="td-exp">$60.00</td>
+              <td class="td-context">200k</td>
+            </tr>
+            <tr>
+              <td><strong>o3</strong></td>
+              <td>OpenAI</td>
+              <td class="td-price">$2.00</td>
+              <td class="td-price">$8.00</td>
+              <td class="td-context">200k</td>
+            </tr>
+            <tr>
+              <td><strong>o4-mini</strong></td>
+              <td>OpenAI</td>
+              <td class="td-price">$1.10</td>
+              <td class="td-price">$4.40</td>
+              <td class="td-context">200k</td>
+            </tr>
+            <tr>
+              <td><strong>GPT-5</strong></td>
+              <td>OpenAI</td>
+              <td class="td-price">$1.25</td>
+              <td class="td-price">$10.00</td>
+              <td class="td-context">1M</td>
+            </tr>
+            <tr>
+              <td><strong>Claude Opus 4.6</strong></td>
+              <td>Anthropic</td>
+              <td class="td-price">$5.00</td>
+              <td class="td-price">$25.00</td>
+              <td class="td-context">1M</td>
+            </tr>
+            <tr>
+              <td><strong>Claude Sonnet 4.6</strong></td>
+              <td>Anthropic</td>
+              <td class="td-price">$3.00</td>
+              <td class="td-price">$15.00</td>
+              <td class="td-context">1M</td>
+            </tr>
+            <tr>
+              <td><strong>Claude Haiku 4.5</strong></td>
+              <td>Anthropic</td>
+              <td class="td-cheap">$1.00</td>
+              <td class="td-cheap">$5.00</td>
+              <td class="td-context">200k</td>
+            </tr>
+            <tr>
+              <td><strong>Gemini 2.5 Pro</strong></td>
+              <td>Google</td>
+              <td class="td-price">$1.25</td>
+              <td class="td-price">$10.00</td>
+              <td class="td-context">1M</td>
+            </tr>
+            <tr>
+              <td><strong>Gemini 2.5 Flash</strong></td>
+              <td>Google</td>
+              <td class="td-cheap">$0.30</td>
+              <td class="td-cheap">$2.50</td>
+              <td class="td-context">1M</td>
+            </tr>
+            <tr>
+              <td><strong>Gemini 2.5 Flash-Lite</strong></td>
+              <td>Google</td>
+              <td class="td-cheap">$0.10</td>
+              <td class="td-cheap">$0.40</td>
+              <td class="td-context">1M</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><em>Note: Gemini 2.5 Pro charges a 2x premium on inputs over 200k tokens ($2.50/MTok) and outputs over 200k tokens ($15/MTok). OpenAI o1 and Claude Opus 4.6 are the two most expensive frontier models at standard rates.</em></p>
+
+      <h2>The Input/Output Ratio Problem</h2>
+
+      <p>The raw input price is almost never the number that matters most. Output tokens are 4–5x more expensive, and for many workloads — especially agents and code generation — output volume is what drives the bill.</p>
+
+      <p>Consider a simple document summarization task. You send in 2,000 tokens (the document) and get back 300 tokens (the summary). That's roughly an 87/13 input-to-output split. Now compare that to an agentic coding task where the model writes 4,000 tokens of code in response to a 500-token prompt — a 11/89 split in the other direction.</p>
+
+      <p>The cheapest model per input token may not be the cheapest model per task.</p>
+
+      <h2>Cost by Workload Type</h2>
+
+      <p>These estimates assume 1,000 API calls per workload type. Numbers are rounded for readability.</p>
+
+      <h3>Workload 1: RAG (Retrieval-Augmented Generation)</h3>
+
+      <p>Typical RAG call: 3,000 tokens in (system prompt + retrieved chunks + user query), 500 tokens out. Total: 3,500 tokens per call.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Cost / 1k calls</th>
+              <th>vs GPT-4o</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>GPT-4o mini</td><td class="td-cheap">$0.75</td><td class="td-context">—</td></tr>
+            <tr><td>Gemini 2.5 Flash</td><td class="td-cheap">$1.15</td><td class="td-context">+53%</td></tr>
+            <tr><td>Claude Haiku 4.5</td><td class="td-cheap">$5.50</td><td class="td-context">+633%</td></tr>
+            <tr><td>GPT-4o</td><td class="td-price">$12.50</td><td class="td-context">baseline</td></tr>
+            <tr><td>Claude Sonnet 4.6</td><td class="td-price">$16.50</td><td class="td-context">+32%</td></tr>
+            <tr><td>Gemini 2.5 Pro</td><td class="td-price">$8.75</td><td class="td-context">-30%</td></tr>
+            <tr><td>Claude Opus 4.6</td><td class="td-exp">$27.50</td><td class="td-context">+120%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>For RAG, <strong>GPT-4o mini and Gemini 2.5 Flash dominate on cost</strong>. If your retrieval pipeline is well-tuned and you're not asking the model to do complex reasoning over the retrieved chunks, there's no reason to pay frontier prices here.</p>
+
+      <h3>Workload 2: Document Summarization</h3>
+
+      <p>Typical summarization call: 8,000 tokens in (document), 800 tokens out. Heavy on input.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Cost / 1k calls</th>
+              <th>vs GPT-4o</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Gemini 2.5 Flash-Lite</td><td class="td-cheap">$1.12</td><td class="td-context">—</td></tr>
+            <tr><td>GPT-4o mini</td><td class="td-cheap">$1.68</td><td class="td-context">+50%</td></tr>
+            <tr><td>Gemini 2.5 Flash</td><td class="td-cheap">$4.40</td><td class="td-context">+292%</td></tr>
+            <tr><td>Claude Haiku 4.5</td><td class="td-cheap">$8.00</td><td class="td-context">+614%</td></tr>
+            <tr><td>GPT-4o</td><td class="td-price">$28.00</td><td class="td-context">baseline</td></tr>
+            <tr><td>Gemini 2.5 Pro</td><td class="td-price">$18.00</td><td class="td-context">-36%</td></tr>
+            <tr><td>Claude Sonnet 4.6</td><td class="td-price">$36.00</td><td class="td-context">+29%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>For high-volume document summarization, <strong>Gemini 2.5 Flash-Lite is in a class of its own at $0.10/$0.40 per MTok</strong>. If quality is acceptable for your use case (worth testing), the savings versus GPT-4o are over 25x.</p>
+
+      <h3>Workload 3: Agentic / Multi-step Tasks</h3>
+
+      <p>Agent calls are expensive because they're output-heavy. A typical agentic loop might look like: 2,000 tokens in (tools + context + instructions), 2,000 tokens out (reasoning + tool calls). The 1:1 input/output ratio combined with multiple turns per task compounds quickly.</p>
+
+      <p>With 5 turns per task, 1,000 tasks = 5,000 API calls. At 4,000 tokens per call (2k in, 2k out):</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Cost / 1k tasks (5 turns)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>GPT-4o mini</td><td class="td-cheap">$7.50</td></tr>
+            <tr><td>Gemini 2.5 Flash</td><td class="td-cheap">$14.00</td></tr>
+            <tr><td>Claude Haiku 4.5</td><td class="td-cheap">$30.00</td></tr>
+            <tr><td>o4-mini</td><td class="td-price">$27.50</td></tr>
+            <tr><td>GPT-4o</td><td class="td-price">$62.50</td></tr>
+            <tr><td>Claude Sonnet 4.6</td><td class="td-price">$90.00</td></tr>
+            <tr><td>o3</td><td class="td-price">$50.00</td></tr>
+            <tr><td>Claude Opus 4.6</td><td class="td-exp">$150.00</td></tr>
+            <tr><td>o1</td><td class="td-exp">$187.50</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">The agent cost trap</div>
+        <p>These numbers assume a clean 5-turn task. Real agentic workloads often run 10–20 turns, retry on errors, and pass the full conversation history on every call — which means the input size grows every turn. Costs can easily be 3–5x these estimates in production. See our post on <a href="/blog/hidden-costs-ai-agents-production/">the hidden costs of AI agents</a> for the full breakdown.</p>
+      </div>
+
+      <h3>Workload 4: Code Generation</h3>
+
+      <p>Code generation is output-heavy. A typical code gen call: 1,000 tokens in (instructions + context), 3,000 tokens out (code + explanation). 3:1 output ratio.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Cost / 1k calls</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>GPT-4o mini</td><td class="td-cheap">$1.95</td><td class="td-context">Quality trade-off for complex tasks</td></tr>
+            <tr><td>Gemini 2.5 Flash</td><td class="td-cheap">$7.80</td><td class="td-context">Strong at 1M context window tasks</td></tr>
+            <tr><td>Claude Haiku 4.5</td><td class="td-cheap">$16.00</td><td class="td-context">Fast, reasonable for boilerplate</td></tr>
+            <tr><td>o4-mini</td><td class="td-price">$14.30</td><td class="td-context">Reasoning model, better at hard problems</td></tr>
+            <tr><td>GPT-4o</td><td class="td-price">$32.50</td><td class="td-context">Reliable, widely tested</td></tr>
+            <tr><td>Claude Sonnet 4.6</td><td class="td-price">$48.00</td><td class="td-context">Strong at agentic coding tasks</td></tr>
+            <tr><td>o3</td><td class="td-price">$26.00</td><td class="td-context">Good cost/quality ratio for reasoning</td></tr>
+            <tr><td>Claude Opus 4.6</td><td class="td-exp">$80.00</td><td class="td-context">Best quality, highest cost</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>When Reasoning Models Are Worth It</h2>
+
+      <p>OpenAI's o-series models (o1, o3, o4-mini) and Anthropic's extended thinking mode charge for reasoning tokens that the model generates internally before producing output. These are expensive — o1 is $15/$60 per MTok — but for certain tasks, they outperform standard models and can reduce total cost by solving problems in fewer turns.</p>
+
+      <p>The rule of thumb: use a reasoning model when the cost of a wrong answer is high. Math proofs, security audits, complex debugging, legal document analysis. Don't use them for classification, summarization, or any task where a faster model reliably gets it right.</p>
+
+      <p><strong>o4-mini at $1.10/$4.40</strong> is the most cost-efficient reasoning model right now — cheaper than GPT-4o on input, with reasoning capability. It's the default choice when you need more than a standard model but can't justify o1 pricing.</p>
+
+      <h2>Batch API: The Underused Cost Lever</h2>
+
+      <p>Both Anthropic and Google offer 50% discounts for batch (async) processing. If your workload isn't latency-sensitive — data pipelines, nightly evals, bulk document processing — this is the biggest single cost reduction available without changing models.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Standard input</th>
+              <th>Batch input</th>
+              <th>Standard output</th>
+              <th>Batch output</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Claude Opus 4.6</td><td class="td-price">$5.00</td><td class="td-cheap">$2.50</td><td class="td-price">$25.00</td><td class="td-cheap">$12.50</td></tr>
+            <tr><td>Claude Sonnet 4.6</td><td class="td-price">$3.00</td><td class="td-cheap">$1.50</td><td class="td-price">$15.00</td><td class="td-cheap">$7.50</td></tr>
+            <tr><td>Claude Haiku 4.5</td><td class="td-cheap">$1.00</td><td class="td-cheap">$0.50</td><td class="td-cheap">$5.00</td><td class="td-cheap">$2.50</td></tr>
+            <tr><td>Gemini 2.5 Pro</td><td class="td-price">$1.25</td><td class="td-cheap">$0.625</td><td class="td-price">$10.00</td><td class="td-cheap">$5.00</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>The Bottom Line: Which Model Should You Use?</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Use case</th>
+              <th>Best cost option</th>
+              <th>Best quality option</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>High-volume RAG</td><td class="td-cheap">GPT-4o mini / Gemini 2.5 Flash</td><td>Claude Sonnet 4.6 / Gemini 2.5 Pro</td></tr>
+            <tr><td>Document summarization</td><td class="td-cheap">Gemini 2.5 Flash-Lite</td><td>Claude Sonnet 4.6</td></tr>
+            <tr><td>Agentic tasks</td><td class="td-cheap">GPT-4o mini (simple) / o4-mini (complex)</td><td>Claude Opus 4.6</td></tr>
+            <tr><td>Code generation</td><td class="td-cheap">Gemini 2.5 Flash / o4-mini</td><td>Claude Sonnet 4.6 / Claude Opus 4.6</td></tr>
+            <tr><td>Reasoning / hard problems</td><td class="td-cheap">o4-mini</td><td>o1 / Claude Opus 4.6</td></tr>
+            <tr><td>Batch pipelines</td><td class="td-cheap">Claude Haiku 4.5 (batch)</td><td>Claude Sonnet 4.6 (batch)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The most important takeaway: <strong>model selection alone can create a 20–50x cost difference for the same workload</strong>. The worst case is defaulting to a frontier model (Opus, o1, GPT-4o) for tasks that don't need it. Build a policy for model routing based on task complexity and run it consistently.</p>
+
+      <div class="callout callout-green">
+        <div class="callout-title">Track it before you optimize it</div>
+        <p>You can't make good model routing decisions without per-request cost data. <a href="https://github.com/ModologyStudiosLLC/clawcost">ClawCost</a> runs as a local proxy in front of any OpenAI-compatible API, logs every token, and enforces daily/monthly hard spending caps — so you know exactly what each model is costing you before you commit to it.</p>
+      </div>
+
+      <hr>
+
+      <p><strong>Related reading:</strong> <a href="/blog/why-llm-costs-higher-than-expected/">Why your LLM costs are 10x higher than expected</a> · <a href="/blog/hidden-costs-ai-agents-production/">The hidden costs of running AI agents in production</a> · <a href="/blog/prompt-caching-saves-money/">Does prompt caching actually save money?</a></p>
+
+      <div class="article-cta">
+        <h3>See exactly what each model is costing you</h3>
+        <p>ClawCost proxies any OpenAI-compatible API, logs every token per model, and lets you set hard spending limits — one env var to install.</p>
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="btn-cta" target="_blank">Get ClawCost free →</a>
+        <a href="/faq/" class="btn-outline">Read the FAQ</a>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a href="/" class="footer-logo">
+        <div class="nav-logo-mark" style="width:22px;height:22px">
+          <svg width="11" height="11" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        ClawCost
+      </a>
+      <div class="footer-links">
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="footer-link" target="_blank">GitHub</a>
+        <a href="/blog/" class="footer-link">Blog</a>
+        <a href="/faq/" class="footer-link">FAQ</a>
+        <a href="/vs-helicone/" class="footer-link">vs Helicone</a>
+        <a href="/vs-langsmith/" class="footer-link">vs LangSmith</a>
+      </div>
+      <div class="footer-right">Built for the OpenClaw community</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

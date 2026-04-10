@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why Your LLM Costs Are 10x Higher Than Expected (And How to Fix It) — ClawCost</title>
+<meta name="description" content="Context window bloat, tool call overhead, missing prompt caching, and output verbosity are silently multiplying your AI API bill. Here's exactly how to find and fix each one.">
+<link rel="canonical" href="https://getclawcost.com/blog/why-llm-costs-higher-than-expected/">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<meta property="og:title" content="Why Your LLM Costs Are 10x Higher Than Expected (And How to Fix It)">
+<meta property="og:description" content="Context bloat, tool overhead, and output verbosity are silently multiplying your AI API bill. Here's how to find and fix each one.">
+<meta property="og:image" content="https://getclawcost.com/og.png">
+<meta property="og:url" content="https://getclawcost.com/blog/why-llm-costs-higher-than-expected/">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Why Your LLM Costs Are 10x Higher Than Expected (And How to Fix It)">
+<meta name="twitter:description" content="Context bloat, tool overhead, and output verbosity are silently multiplying your AI API bill.">
+<meta name="twitter:image" content="https://getclawcost.com/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Why Your LLM Costs Are 10x Higher Than Expected (And How to Fix It)",
+  "description": "Context window bloat, tool call overhead, missing prompt caching, and output verbosity are silently multiplying your AI API bill.",
+  "datePublished": "2026-04-09",
+  "dateModified": "2026-04-09",
+  "author": { "@type": "Organization", "name": "ClawCost" },
+  "publisher": { "@type": "Organization", "name": "ClawCost", "url": "https://getclawcost.com" }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+:root {
+  --bg: #07080c; --surface: #0d0f18; --surface2: #131822;
+  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+  --text: #eaedf5; --text2: #8891a8; --text3: #484d68;
+  --brand: #e8961e; --brand2: #ffc04d; --green: #00d47e;
+  --radius: 14px; --radius-sm: 8px;
+}
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+h1, h2, h3, h4 { font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif; }
+.bg-grid { position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px); background-size: 32px 32px; mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%); -webkit-mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, black 30%, transparent 80%); }
+.container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--border); background: rgba(7,8,12,0.85); }
+.nav-inner { display: flex; align-items: center; gap: 32px; height: 60px; }
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: -0.02em; }
+.nav-logo-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--brand); display: grid; place-items: center; flex-shrink: 0; }
+.nav-links { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.nav-link { color: var(--text2); text-decoration: none; font-size: 14px; font-weight: 500; padding: 6px 12px; border-radius: var(--radius-sm); transition: color 0.15s, background 0.15s; }
+.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.nav-cta { background: var(--brand); color: #0a0a0e; font-weight: 600; font-size: 14px; padding: 8px 18px; border-radius: var(--radius-sm); text-decoration: none; transition: background 0.15s, box-shadow 0.15s, transform 0.15s; margin-left: 8px; }
+.nav-cta:hover { background: var(--brand2); box-shadow: 0 0 32px rgba(232,150,30,0.5); transform: translateY(-1px); }
+.article-wrap { position: relative; z-index: 1; padding-top: 100px; padding-bottom: 96px; }
+.article-header { max-width: 760px; margin: 0 auto 48px; }
+.article-breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text3); margin-bottom: 20px; }
+.article-breadcrumb a { color: var(--text2); text-decoration: none; }
+.article-breadcrumb a:hover { color: var(--brand); }
+.article-breadcrumb span { color: var(--text3); }
+.article-meta { display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--text2); margin-bottom: 24px; flex-wrap: wrap; }
+.article-tag { background: rgba(232,150,30,0.12); color: var(--brand); padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+h1.article-title { font-size: clamp(28px, 4vw, 46px); font-weight: 700; line-height: 1.15; letter-spacing: -0.03em; color: var(--text); margin-bottom: 20px; }
+.article-subtitle { font-size: 18px; color: var(--text2); line-height: 1.6; max-width: 680px; }
+.article-body { max-width: 760px; margin: 0 auto; }
+.article-body p { margin-bottom: 20px; color: var(--text); font-size: 16px; line-height: 1.75; }
+.article-body h2 { font-size: 26px; font-weight: 700; letter-spacing: -0.025em; margin-top: 52px; margin-bottom: 20px; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+.article-body h3 { font-size: 19px; font-weight: 600; letter-spacing: -0.02em; margin-top: 36px; margin-bottom: 14px; color: var(--text); }
+.article-body h4 { font-size: 12px; font-weight: 600; margin-top: 28px; margin-bottom: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; }
+.article-body ul, .article-body ol { margin: 0 0 20px 20px; color: var(--text); font-size: 16px; line-height: 1.75; }
+.article-body li { margin-bottom: 6px; }
+.article-body strong { color: var(--text); font-weight: 600; }
+.article-body em { color: var(--text2); font-style: italic; }
+.article-body a { color: var(--brand); text-decoration: none; }
+.article-body a:hover { text-decoration: underline; }
+.article-body hr { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+.article-body blockquote { border-left: 3px solid var(--brand); padding: 4px 20px; margin: 24px 0; color: var(--text2); font-style: italic; }
+.article-body code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--surface2); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; color: var(--brand2); }
+.article-body pre { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px 24px; margin: 24px 0; overflow-x: auto; }
+.article-body pre code { background: none; border: none; padding: 0; font-size: 13px; color: var(--text2); }
+.table-wrap { overflow-x: auto; margin: 28px 0; border-radius: var(--radius); border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 480px; }
+thead tr { background: var(--surface2); border-bottom: 1px solid var(--border2); }
+thead th { padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text2); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.02); }
+tbody td { padding: 12px 16px; color: var(--text); vertical-align: middle; }
+.td-mono { font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+.td-bad { color: #ff6b6b; font-weight: 600; }
+.td-good { color: var(--green); font-weight: 600; }
+.td-context { color: var(--text3); font-size: 13px; }
+.callout { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--brand); border-radius: var(--radius-sm); padding: 20px 24px; margin: 32px 0; }
+.callout p { margin: 0; font-size: 15px; }
+.callout-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brand); margin-bottom: 10px; }
+.callout-red { border-left-color: #ff6b6b; }
+.callout-red .callout-title { color: #ff6b6b; }
+.callout-green { border-left-color: var(--green); }
+.callout-green .callout-title { color: var(--green); }
+.fix-box { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 20px; margin: 20px 0; }
+.fix-box-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; }
+.fix-box p { margin: 0; font-size: 14px; color: var(--text2); }
+.article-cta { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 40px; margin-top: 64px; text-align: center; }
+.article-cta h3 { font-size: 22px; font-weight: 700; margin-bottom: 12px; margin-top: 0; }
+.article-cta p { color: var(--text2); margin-bottom: 24px; font-size: 15px; }
+.btn-cta { display: inline-flex; align-items: center; gap: 8px; background: var(--brand); color: #0a0a0e; font-weight: 700; font-size: 15px; padding: 12px 28px; border-radius: var(--radius-sm); text-decoration: none; transition: background 0.15s, box-shadow 0.15s, transform 0.15s; }
+.btn-cta:hover { background: var(--brand2); box-shadow: 0 0 32px rgba(232,150,30,0.4); transform: translateY(-1px); text-decoration: none; }
+.btn-outline { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: var(--text2); font-weight: 500; font-size: 15px; padding: 12px 28px; border-radius: var(--radius-sm); text-decoration: none; border: 1px solid var(--border2); transition: border-color 0.15s, color 0.15s; margin-left: 12px; }
+.btn-outline:hover { border-color: var(--brand); color: var(--brand); text-decoration: none; }
+footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 32px 0; }
+.footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.footer-logo { display: flex; align-items: center; gap: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 15px; color: var(--text); text-decoration: none; letter-spacing: -0.02em; }
+.footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+.footer-link { color: var(--text3); text-decoration: none; font-size: 13px; transition: color 0.15s; }
+.footer-link:hover { color: var(--text2); }
+.footer-right { color: var(--text3); font-size: 13px; }
+@media (max-width: 640px) { .nav-links a:not(.nav-cta) { display: none; } .article-wrap { padding-top: 84px; } .article-body h2 { font-size: 22px; } }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<nav>
+  <div class="container nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg width="14" height="14" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      ClawCost
+    </a>
+    <div class="nav-links">
+      <a href="/#features" class="nav-link">Features</a>
+      <a href="/#pricing" class="nav-link">Pricing</a>
+      <a href="/blog/" class="nav-link" style="color:var(--brand)">Blog</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-link" target="_blank">GitHub</a>
+      <a href="https://github.com/ModologyStudiosLLC/clawcost" class="nav-cta" target="_blank">Get started →</a>
+    </div>
+  </div>
+</nav>
+
+<main class="article-wrap">
+  <div class="container">
+    <div class="article-header">
+      <div class="article-breadcrumb">
+        <a href="/">ClawCost</a>
+        <span>›</span>
+        <a href="/blog/">Blog</a>
+        <span>›</span>
+        <span>Why LLM Costs Are Higher Than Expected</span>
+      </div>
+      <div class="article-meta">
+        <span class="article-tag">Cost Optimization</span>
+        <span>April 2026</span>
+        <span>·</span>
+        <span>10 min read</span>
+      </div>
+      <h1 class="article-title">Why Your LLM Costs Are 10x Higher Than Expected (And How to Fix It)</h1>
+      <p class="article-subtitle">You looked at the pricing page, did the math, and felt confident about the budget. Then the first monthly bill arrived. Here are the six reasons that happen — and the specific fix for each one.</p>
+    </div>
+
+    <div class="article-body">
+
+      <p>The mental model most developers use when estimating LLM costs goes something like: <em>"I'll send about 1,000 tokens per request and get back 500 tokens. At $3/MTok input and $15/MTok output, that's $0.0105 per call. Easy."</em></p>
+
+      <p>That model is almost always wrong. Not slightly wrong — often off by 5–10x in production. Here's why.</p>
+
+      <h2>Problem 1: Context Window Bloat</h2>
+
+      <p>Every API call bills you for the <em>entire</em> context sent — system prompt, conversation history, retrieved documents, tool definitions, and the current user message. In multi-turn applications, the context grows with every exchange, and you pay for all of it on every call.</p>
+
+      <p>A typical pattern: turn 1 sends 500 tokens. Turn 5 sends 3,500 tokens (because the previous four turns are now in the context). Turn 10 sends 7,000 tokens. You estimated 500 per call; you're paying 10–14x that by mid-conversation.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Turn</th><th>New tokens added</th><th>Total context sent</th><th>Cost at Claude Sonnet 4.6 input</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td class="td-mono">500</td><td class="td-mono">1,200 (incl. system prompt)</td><td class="td-mono">$0.0036</td></tr>
+            <tr><td>5</td><td class="td-mono">500</td><td class="td-mono">4,700</td><td class="td-mono">$0.0141</td></tr>
+            <tr><td>10</td><td class="td-mono">500</td><td class="td-mono">9,200</td><td class="td-mono">$0.0276</td></tr>
+            <tr><td>20</td><td class="td-mono">500</td><td class="td-mono">18,200</td><td class="td-mono">$0.0546</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="fix-box">
+        <div class="fix-box-label">Fix</div>
+        <p>Implement a sliding context window or conversation summarization. After N turns, summarize older turns into a compact summary and drop the raw history. You pay once for the summarization call, then send a condensed context going forward. Combined with prompt caching on the stable parts, this can cut context costs by 60–80%.</p>
+      </div>
+
+      <h2>Problem 2: Tool Call Token Overhead</h2>
+
+      <p>When you use tool use / function calling, you're paying for more tokens than you see. Anthropic's pricing docs document this explicitly: every API call with tools enabled adds a <strong>346-token system prompt</strong> that the model needs to understand how tool use works. Every tool definition you pass also consumes input tokens.</p>
+
+      <p>A typical setup with 5 tools, each with a name, description, and JSON schema, can easily add 1,000–2,000 tokens to every single request — before the user's message is even counted. If you're running 100,000 agent calls per month with 5 tools defined, you might be paying for 100–200 million invisible input tokens.</p>
+
+      <p>At Claude Sonnet 4.6 ($3/MTok input), that's <strong>$300–$600/month in overhead you never see in your prompt</strong>.</p>
+
+      <div class="fix-box">
+        <div class="fix-box-label">Fix</div>
+        <p>Only pass tools the model actually needs for the current step. In agentic pipelines, provide a subset of tools per stage rather than the full toolset on every call. Trim tool descriptions to the minimum needed — a 30-word description is usually as useful as a 200-word one. Remove tools entirely when you're in a step that doesn't need them (tool overhead drops to zero with <code>tool_choice: none</code>).</p>
+      </div>
+
+      <h2>Problem 3: Output Verbosity</h2>
+
+      <p>Output tokens cost 4–5x more than input tokens. This is the most expensive line on your bill, and it's often controllable.</p>
+
+      <p>LLMs default to verbose, explanatory output — especially when given no instructions about length. A model asked to "check if this email is a phishing attempt" might return three paragraphs of reasoning when you only need a boolean and a confidence score. At $15/MTok for Claude Sonnet 4.6 output, a 1,000-token response costs $0.015. The same task answered in 50 tokens costs $0.00075 — a 20x difference.</p>
+
+      <div class="callout callout-red">
+        <div class="callout-title">Real example: classification endpoint</div>
+        <p>A developer running a sentiment classification endpoint was averaging 800 output tokens per call. After adding "Respond with only a JSON object containing 'label' and 'confidence'. No explanation." to the system prompt, average output dropped to 35 tokens. Monthly output token cost fell from ~$960 to ~$42 on 80,000 daily calls — same model, same accuracy.</p>
+      </div>
+
+      <div class="fix-box">
+        <div class="fix-box-label">Fix</div>
+        <p>Be explicit about output format and length in your system prompt. For structured outputs, use <code>response_format: json_schema</code> (OpenAI) or tool use with a schema (Anthropic) to constrain the response shape. Set <code>max_tokens</code> to a value close to what you actually need — it doesn't reduce quality but it prevents runaway verbosity and limits unexpected cost spikes.</p>
+      </div>
+
+      <h2>Problem 4: Not Using Prompt Caching</h2>
+
+      <p>If your system prompt, a large document, or a long conversation history repeats across requests, you're paying full price for it every time — unless you enable prompt caching.</p>
+
+      <p>Anthropic's prompt caching charges 1.25x on the first write (5-minute TTL) or 2x for a 1-hour TTL, then only 0.10x (10% of normal input price) on cache hits. If your system prompt is 2,000 tokens and you make 1,000 calls per day, without caching you're paying <code>2,000 × 1,000 × $3/MTok = $6/day</code> just for the system prompt. With caching, you pay $0.0075 for the write and $0.60 for 999 cache reads — <strong>$6.00/day becomes $0.61/day, a 10x reduction on that portion of the cost</strong>.</p>
+
+      <p>See our full breakdown: <a href="/blog/prompt-caching-saves-money/">Does prompt caching actually save money?</a></p>
+
+      <div class="fix-box">
+        <div class="fix-box-label">Fix</div>
+        <p>Add <code>"cache_control": {"type": "ephemeral"}</code> to stable content blocks in your API calls. On Anthropic, the minimum cacheable block is 1,024 tokens. Put your cache breakpoint after the system prompt and any static documents. For conversations, cache at the end of the conversation history so only the latest exchange is billed at full price.</p>
+      </div>
+
+      <h2>Problem 5: Wrong Model for the Task</h2>
+
+      <p>This is the most common and most expensive mistake. Teams default to a frontier model (GPT-4o, Claude Sonnet, Gemini 2.5 Pro) for everything because it "just works", then never revisit the choice as the application scales.</p>
+
+      <p>The cost difference between model tiers is enormous. Claude Haiku 4.5 ($1/$5 per MTok) is 3x cheaper on input and 3x cheaper on output than Claude Sonnet 4.6 ($3/$15). For tasks that don't require frontier intelligence — intent classification, simple Q&A, format conversion, data extraction from structured inputs — Haiku performs comparably and costs a fraction.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Task type</th><th>Minimum viable model</th><th>Cost vs frontier</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Intent classification</td><td>GPT-4o mini / Haiku 4.5</td><td class="td-good">~20x cheaper</td></tr>
+            <tr><td>Simple Q&A (chatbot)</td><td>GPT-4o mini / Haiku 4.5</td><td class="td-good">~15x cheaper</td></tr>
+            <tr><td>Data extraction (structured input)</td><td>GPT-4o mini / Gemini Flash</td><td class="td-good">~10x cheaper</td></tr>
+            <tr><td>Complex reasoning / agents</td><td>Claude Sonnet / GPT-4o</td><td class="td-context">2–3x cheaper than Opus/o1</td></tr>
+            <tr><td>Code generation (complex)</td><td>Claude Sonnet / o4-mini</td><td class="td-context">2–3x cheaper than Opus/o1</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="fix-box">
+        <div class="fix-box-label">Fix</div>
+        <p>Implement model routing based on task complexity. Route simple, high-volume tasks (classification, extraction, summarization) to a cheap model. Route complex, low-volume tasks (reasoning, code review, writing) to a frontier model. A well-tuned two-tier router typically reduces overall costs by 50–70% with minimal quality impact. Test quality on a sample before committing to the switch.</p>
+      </div>
+
+      <h2>Problem 6: No Budget Enforcement</h2>
+
+      <p>The above five problems compound when there's no real-time cost tracking or hard spending cap. A small regression — an extra tool added to the system prompt, a loop that runs one extra turn, a context window that doesn't get trimmed — can silently double your costs over a week without triggering any alert.</p>
+
+      <p>Provider dashboards show you monthly totals. They don't show you which endpoint, which user, or which code change caused the spike. By the time the bill arrives, it's too late.</p>
+
+      <div class="callout callout-red">
+        <div class="callout-title">A real scenario: the agent retry loop</div>
+        <p>An agent calling an external API gets a rate limit error. The retry logic retries 5 times with the full conversation context on each attempt. Each failed call costs the same as a successful one. If this happens 100 times per day and your context is 5,000 tokens, you're spending $2.25/day ($67/month) on API calls that produce nothing — and you won't see it unless you're tracking per-call costs.</p>
+      </div>
+
+      <div class="fix-box">
+        <div class="fix-box-label">Fix</div>
+        <p>Run a local cost proxy like <a href="https://github.com/ModologyStudiosLLC/clawcost">ClawCost</a> in front of your API calls. It logs every token, tags costs by endpoint or user, and enforces hard daily and monthly spending budgets — stopping runaway agents before they run up a surprise bill. One env var change; works with Anthropic, OpenAI, Gemini, and any OpenAI-compatible API.</p>
+      </div>
+
+      <h2>The Compound Effect</h2>
+
+      <p>These six problems don't add up linearly — they multiply. A team running a frontier model (5x cheaper alternative available), with verbose outputs (10x shorter possible), growing context windows (4x smaller with summarization), and no prompt caching (10x cheaper with caching) could theoretically be paying <strong>2,000x more than necessary</strong> for the same functionality.</p>
+
+      <p>In practice, a realistic team with just three of these problems unaddressed is typically paying 10–20x what they need to. The fixes aren't hard — they just require visibility into what's actually being sent and received on every call.</p>
+
+      <hr>
+
+      <p><strong>Related reading:</strong> <a href="/blog/llm-api-cost-comparison/">GPT-4o vs Claude vs Gemini: which is cheapest?</a> · <a href="/blog/prompt-caching-saves-money/">Does prompt caching actually save money?</a> · <a href="/blog/ai-agent-spending-limits/">How to set hard spending limits on AI agents</a></p>
+
+      <div class="article-cta">
+        <h3>Find out where your money is actually going</h3>
+        <p>ClawCost logs every token, every model, every endpoint — and lets you set hard caps so the bill can't surprise you. One <code>OPENAI_BASE_URL</code> change to install.</p>
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="btn-cta" target="_blank">Get ClawCost free →</a>
+        <a href="/faq/" class="btn-outline">Read the FAQ</a>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a href="/" class="footer-logo">
+        <div class="nav-logo-mark" style="width:22px;height:22px">
+          <svg width="11" height="11" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4.5M7.5 14v-4.5M1 7.5h4.5M14 7.5h-4.5M3.4 3.4l3.2 3.2M11.6 11.6l-3.2-3.2M11.6 3.4l-3.2 3.2M3.4 11.6l3.2-3.2" stroke="#0a0a0e" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        ClawCost
+      </a>
+      <div class="footer-links">
+        <a href="https://github.com/ModologyStudiosLLC/clawcost" class="footer-link" target="_blank">GitHub</a>
+        <a href="/blog/" class="footer-link">Blog</a>
+        <a href="/faq/" class="footer-link">FAQ</a>
+        <a href="/vs-helicone/" class="footer-link">vs Helicone</a>
+        <a href="/vs-langsmith/" class="footer-link">vs LangSmith</a>
+      </div>
+      <div class="footer-right">Built for the OpenClaw community</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
